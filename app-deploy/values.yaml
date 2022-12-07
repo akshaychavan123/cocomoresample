@@ -1,48 +1,103 @@
-# Default values for app-deploy.
-# This is a YAML-formatted file.
-# Declare variables to be passed into your templates.
-# For Custom CNAME configuration refer docs first: https://builderai.quip.com/S1SiA9110Eph/Using-Custom-CNAME
-
-replicaCount: 2
-
 PodDisruptionBudget:
-  minAvailable: "50%"
-
-# Specify additional values that will be presented as environment variables to the pod.
+  minAvailable: 50%
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+    - podAffinityTerm:
+        labelSelector:
+          matchExpressions:
+          - key: app.kubernetes.io/name
+            operator: In
+            values:
+            - app-deploy
+        topologyKey: kubernetes.io/hostname
+      weight: 1
+affinitySidekiq:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+    - podAffinityTerm:
+        labelSelector:
+          matchExpressions:
+          - key: app.kubernetes.io/name
+            operator: In
+            values:
+            - app-deploySidekiq
+        topologyKey: kubernetes.io/hostname
+      weight: 1
+annotations:
+  prometheus.io/port: '3000'
+  prometheus.io/scrape: 'true'
 appExtConfig:
-  PROJECT_TYPE: "studio_store" 
-  HOST_URL: "cocomore-300779-ruby.b300779.dev.eastus.az.svc.builder.cafe/"
-  RUBY_ANALYTICS_TOKEN: "ADvoiejfyI6IHGJbitMe9MGLbkPRxj6n"
-  DL_APP_NAME: "ecommerceapp"
-  NAMESPACE: "CocoMore-300779"
-  RAILS_MAX_THREADS: "10"
-  REDIS_URL: "redis"
-  RAILS_LOG_TO_STDOUT: "true"
-  RAILS_ENV: "production"
-  SMTP_USERNAME: "WE4CX23WXDSU33WDOAAEWAK6JU"
-  SMTP_PORT: "587"
-  SMTP_ADDRESS: "smtp.develmail.com"
-
+  DL_APP_NAME: ecommerceapp
+  HOST_URL: cocomore-300779-ruby.b300779.dev.eastus.az.svc.builder.cafe/
+  NAMESPACE: CocoMore-300779
+  OFFICE365_ACCOUNT_ID: 4006c537-61a5-42bb-a9e6-6ff53b75730c
+  OFFICE365_EMAIL: admin@builderautomddajpvvcli.onmicrosoft.com
+  OFFICE365_PASSWORD: G4mDHtjP*
+  OFFICE365_TENANT: 8dfbf481-d9c1-4e49-9745-845e9542e640
+  PROJECT_TYPE: studio_store
+  RAILS_ENV: production
+  RAILS_LOG_TO_STDOUT: 'true'
+  RAILS_MAX_THREADS: '10'
+  REDIS_URL: redis
+  RUBY_ANALYTICS_TOKEN: ADvoiejfyI6IHGJbitMe9MGLbkPRxj6n
+  SMTP_ADDRESS: smtp.develmail.com
+  SMTP_PORT: '587'
+  SMTP_USERNAME: WE4CX23WXDSU33WDOAAEWAK6JU
+  USER_ID: edf0fffc-941d-461c-9d3f-0a0099af5e35
+  USER_NAME: cocomore_300779@email.store.builder.ai
+autoscaling:
+  behavior:
+    scaleDown:
+      policies:
+      - periodSeconds: 30
+        type: Percent
+        value: 100
+      stabilizationWindowSeconds: 120
+    scaleUp:
+      policies:
+      - periodSeconds: 30
+        type: Percent
+        value: 100
+      stabilizationWindowSeconds: 0
+  enabled: false
+  maxReplicas: 3
+  minReplicas: 2
+  targetCPU: 50
+  targetMemory: 80
+fullnameOverride: ''
 image:
-  repository:  gitlab.builder.ai:5000/template-app
   pullPolicy: IfNotPresent
+  repository: gitlab.builder.ai:5000/template-app
   tag: 8.8.8
-
 imagePullSecrets: []
-
-nameOverride: ""
-fullnameOverride: ""
-
+ingress:
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-staging
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/proxy-body-size: 50m
+  enabled: true
+  hosts:
+  - host: rrapp.local
+    paths:
+    - /
+  rsa_key_length: '2048'
+  tls:
+  - hosts:
+    - rrapp.local
+    secretName: https-cert
+nameOverride: ''
+nodeSelector: {}
+podSecurityContext: {}
 probes:
   livenessProbe:
-    path: /healthcheck
     initialDelaySeconds: 40
+    path: /healthcheck
     periodSeconds: 10
   readinessProbe:
-    path: /healthcheck
     initialDelaySeconds: 40
+    path: /healthcheck
     periodSeconds: 20
-
 probesSidekiq:
   livenessProbe:
     initialDelaySeconds: 120
@@ -50,57 +105,42 @@ probesSidekiq:
   readinessProbe:
     initialDelaySeconds: 120
     periodSeconds: 20
-
 railsMigration:
-  enabled: true
-  timeout: 300
-  retry: 2
   command:
-    - bundle
-    - exec
-    - rails
-    - db:migrate
-    - db:seed
-
-
+  - bundle
+  - exec
+  - rails
+  - db:migrate
+  - db:seed
+  enabled: true
+  retry: 2
+  timeout: 300
 railsSidekiq:
-  enabled: false
-  replicaCount: 1
   annotations:
-    prometheus.io/scrape: 'true'
     prometheus.io/port: '9394'
+    prometheus.io/scrape: 'true'
   autoscaling:
-    enabled: false
-    minReplicas: 1
-    # maxReplicas must not exceed the max node count
-    maxReplicas: 3
-    targetCPU: 50
-    targetMemory: 80 
     behavior:
       scaleDown:
+        policies:
+        - periodSeconds: 30
+          type: Percent
+          value: 100
         stabilizationWindowSeconds: 120
-        policies:
-        - type: Percent
-          value: 100
-          periodSeconds: 30
       scaleUp:
-        stabilizationWindowSeconds: 0
         policies:
-        - type: Percent
+        - periodSeconds: 30
+          type: Percent
           value: 100
-          periodSeconds: 30
-
-serviceAccount:
-  # Specifies whether a service account should be created
-  create: true
-  # Annotations to add to the service account
-  annotations: {}
-  # The name of the service account to use.
-  # If not set and create is true, a name is generated using the fullname template
-  name:
-
-# The following values are based on RAILS_MAX_THREADS: "10" in appExtConfig above
-# If one of them is changed, the other might need changing too
+        stabilizationWindowSeconds: 0
+    enabled: false
+    maxReplicas: 3
+    minReplicas: 1
+    targetCPU: 50
+    targetMemory: 80
+  enabled: false
+  replicaCount: 1
+replicaCount: 2
 resources:
   limits:
     cpu: 350m
@@ -108,7 +148,22 @@ resources:
   requests:
     cpu: 350m
     memory: 315Mi
-
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+    - ALL
+  privileged: false
+  readOnlyRootFilesystem: false
+  runAsNonRoot: true
+  runAsUser: 1000
+service:
+  port: 80
+  type: ClusterIP
+serviceAccount:
+  annotations: {}
+  create: true
+  name: null
 sidekiqResources:
   limits:
     cpu: 350m
@@ -116,95 +171,4 @@ sidekiqResources:
   requests:
     cpu: 350m
     memory: 315Mi
-
-# Enable the kubernetes horizontal pod autoscaler for this application
-autoscaling:
-  enabled: false
-  minReplicas: 2
-  maxReplicas: 3
-  targetCPU: 50
-  targetMemory: 80
-  behavior:
-    scaleDown:
-      stabilizationWindowSeconds: 120
-      policies:
-      - type: Percent
-        value: 100
-        periodSeconds: 30
-    scaleUp:
-      stabilizationWindowSeconds: 0
-      policies:
-      - type: Percent
-        value: 100
-        periodSeconds: 30
-
-podSecurityContext: {}
-  # fsGroup: 2000
-
-securityContext:
-  capabilities:
-    drop:
-    - ALL
-  readOnlyRootFilesystem: false
-  runAsNonRoot: true
-  runAsUser: 1000
-  privileged: false
-  allowPrivilegeEscalation: false
-
-service:
-  type: ClusterIP
-  port: 80
-
-annotations:
-  prometheus.io/scrape: 'true'
-  prometheus.io/port: '3000'
-
-ingress:
-  enabled: true
-  rsa_key_length: "2048"
-  annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-staging
-    kubernetes.io/ingress.class: nginx
-    nginx.ingress.kubernetes.io/proxy-body-size: 50m
-    # nginx.ingress.kubernetes.io/server-alias: <custom_cname>
-    # kubernetes.io/ingress.class: nginx
-    # kubernetes.io/tls-acme: "true"
-  hosts:
-    - host: rrapp.local
-      paths: ['/']
-  tls:
-    - secretName: https-cert
-      hosts:
-        - rrapp.local
-        # - <custom_cname>
-
-nodeSelector: {}
-
 tolerations: []
-
-affinity:
-  podAntiAffinity:
-    preferredDuringSchedulingIgnoredDuringExecution:
-      - weight: 1
-        podAffinityTerm:
-            labelSelector:
-              matchExpressions:
-                - key: "app.kubernetes.io/name"
-                  operator: In
-                  values:
-                  - app-deploy
-            topologyKey: "kubernetes.io/hostname"
-
-
-affinitySidekiq:
-  podAntiAffinity:
-    preferredDuringSchedulingIgnoredDuringExecution:
-      - weight: 1
-        podAffinityTerm:
-            labelSelector:
-              matchExpressions:
-                - key: "app.kubernetes.io/name"
-                  operator: In
-                  values:
-                  - app-deploySidekiq
-            topologyKey: "kubernetes.io/hostname"
