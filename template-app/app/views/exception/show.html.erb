@@ -1,0 +1,9 @@
+<div style="text-align: center;">
+  <span style="color: #d61920; font-size: 48px;"><%= @status %> <%= @response.to_s.humanize  %></span>
+  <% if @status == 404 %>
+    <p style="color: #887c7c;">Sorry, this page has moved, or doesn't exist!</p>
+  <% else %>
+    <p style="color: #887c7c;">We're sorry, but our server is experiencing problems!</p>
+  <% end %>
+  <%= link_to 'Go to Home', '/admin', style: 'color: #4bacfe; text-decoration: none;' %>
+</div>

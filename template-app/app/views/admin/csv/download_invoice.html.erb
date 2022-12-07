@@ -1,0 +1,368 @@
+<% default_email_setting = BxBlockSettings::DefaultEmailSetting.first %>
+<% host_url = Rails.env.production? ? $hostname : 'http://localhost:3000' %>
+<% brand_setting = BxBlockStoreProfile::BrandSetting.last %>
+<% admin_user = AdminUser.find_by(role: 'super_admin') %>
+<% is_in_same_state = store_and_billing_state_is_same?(@shipping_address, brand_setting) %>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Invoice</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="license" href="https://www.opensource.org/licenses/mit-license/">
+  <script src="script.js"></script>
+</head>
+<body style="height: auto;">
+<table cellpadding="0" cellspacing="0" class="inner-table" width="100%" style="border: none;">
+  <tbody>
+  <tr>
+    <td style="padding: 0 0 10px 0; width: 100%; border: none;">
+      <div style="width: 100%;">
+        <img src= "<%= url_for(brand_setting.logo) %>" width='170px' />
+      </div>
+    </td>
+  </tr>
+  <tr>
+    <td style="width: 100%; border: none; margin-bottom: 20px;">
+      <div style="width: 100%">
+        <div style="width: 50%; float: left;">
+          <div>
+            <p style="font-size: 15px; margin-bottom: 7px;"><span style="font-weight: bold;">Name:</span> <%= brand_setting&.heading %></p>
+          </div>
+          <div>
+            <p style="font-size: 15px; margin-bottom: 7px;"><span style="font-weight: bold;">Address:</span> <%= brand_setting&.address %>
+            </p>
+          </div>
+        </div>
+        <div style="width: 50%; float: left; text-align: right;">
+          <div>
+            <p style="font-size: 15px; margin-bottom: 7px;"><span style="font-weight: bold;">GSTIN:</span> <%= brand_setting&.gst_number %>
+            </p>
+          </div>
+        </div>
+      </div>
+    </td>
+  </tr>
+  </tbody>
+</table>
+
+<header>
+  <h1>Tax Invoice</h1>
+  <address contenteditable>
+    <p><b>Name:</b> <%= @order.account&.full_name ?  @order.account&.full_name : @billing_address&.name %></p>
+    <% if @shipping_address.present? %>
+      <p>Shipping Address: <%= @shipping_address&.full_address %></p>
+      <p>Shipping Phone: <%= @shipping_address&.phone_number %></p>
+    <% end %>
+    <% if @billing_address.present? %>
+      <p>Billing Address: <%= @billing_address&.full_address %></p>
+      <p>Billing Phone: <%= @billing_address&.phone_number %></p>
+    <% end %>
+  </address>
+</header>
+<article>
+  <h1>Recipient</h1>
+  <table class="meta">
+    <tr>
+      <th><span contenteditable>Order No.</span></th>
+      <td><span contenteditable><%= @order.order_number%></span></td>
+    </tr>
+    <tr>
+      <th><span contenteditable>Order Date</span></th>
+      <td><span contenteditable><%= @order.order_date&.utc&.strftime("%a, #{@order.order_date&.utc&.day.ordinalize} %B %Y") %></span></td>
+    </tr>
+    <tr>
+      <th><span contenteditable>Amount Paid</span></th>
+      <td><span id="prefix" contenteditable></span><span><%= @order.total&.to_f.round(2) %></span></td>
+    </tr>
+  </table>
+  <table class="inventory">
+    <thead>
+      <tr>
+        <th><span contenteditable>Serial#</span></th>
+        <th><span contenteditable>Paritculars</span></th>
+        <th><span contenteditable>Basic Amount (INR)</span></th>
+        <% if is_in_same_state %>
+          <th><span contenteditable>CGST</span></th>
+          <th><span contenteditable>SGST</span></th>
+          <th><span contenteditable>CGST amount (INR)</span></th>
+          <th><span contenteditable>SGST amount (INR)</span></th>
+        <% else %>
+          <th><span contenteditable>IGST</span></th>
+          <th><span contenteditable>IGST amount (INR)</span></th>
+        <% end %>
+        <th><span contenteditable>Quantity</span></th>
+        <th><span contenteditable>Unit Amount (INR)</span></th>
+        <th><span contenteditable>Total Amount (INR)</span></th>
+      </tr>
+    </thead>
+    <tbody>
+    <% @order.order_items.each_with_index do |order_item, index| %>
+      <% catalogue = order_item.catalogue.present? ? order_item.catalogue : BxBlockCatalogue::Catalogue.find(order_item.catalogue_id)  %>
+      <% catalogue_variant = order_item&.catalogue_variant %>
+      <% gst_total = order_item.tax_charge %>
+      <tr>
+        <td><%= index + 1 %></td>
+        <td><a class="cut">-</a><span contenteditable><%= catalogue&.name %></span>
+        <br/>
+          <% if catalogue_variant.present?  %>
+            <% catalogue_variant.catalogue_variant_properties.each do |property| %>
+              <div><%= "#{BxBlockCatalogue::Variant.find(property.variant_id).name} : #{BxBlockCatalogue::VariantProperty.find(property.variant_property_id).name}" %></div>
+              <br/>
+            <% end %>
+          <% end %>
+        </td>
+        <td><%= number_with_precision(order_item.basic_amount.to_f.round(2), :precision => 2) %></td>
+        <% if is_in_same_state %>
+          <td>
+            <%= (order_item.catalogue.tax.tax_percentage/2).to_f rescue 0 %>%
+          </td>
+          <td>
+            <%= (order_item.catalogue.tax.tax_percentage/2).to_f rescue 0 %>%
+          </td>
+          <td>
+            <%= number_with_precision(gst_total/2, :precision => 2) %>
+          </td>
+          <td>
+            <%= number_with_precision(gst_total/2, :precision => 2) %>
+          </td>
+        <% else %>
+          <td>
+            <%= order_item.catalogue.tax.tax_percentage rescue 0 %>%
+          </td>
+          <td>
+            <%= number_with_precision(gst_total, :precision => 2) %>
+          </td>
+            <% end %>
+        <td><%= order_item.order_item_qty %></td>
+        <td><%= number_with_precision(order_item.unit_price.round(2), :precision => 2) %></td>
+        <td><%= number_with_precision(order_item.total_price.round(2), :precision => 2) %></td>
+      </tr>
+    <% end %>
+      </tr>
+    </tbody>
+  </table>
+  <table class="balance">
+    <tr>
+      <th><span contenteditable>Sub Total</span></th>
+      <td><span data-prefix></span><span><%= number_with_precision(@order.sub_total.round(2), :precision => 2) %></span></td>
+    </tr>
+    <tr>
+      <th><span contenteditable>Shipping Charges</span></th>
+      <td><span data-prefix></span>(+)<span><%= number_with_precision(@order.shipping_total.to_f.round(2), :precision=>2) %></span></td>
+    </tr>
+    <% if @order.coupon_code %>
+      <tr>
+        <th><span contenteditable>Discount(Coupon Code: <%= @order.coupon_code&.code %>)</span></th>
+        <td><span data-prefix></span><span><%= number_with_precision(@order.applied_discount.to_f.round(2), :precision=>2) %></span></td>
+      </tr>
+    <% end %>
+    <tr>
+      <th><span contenteditable>Total</span></th>
+      <td><span data-prefix></span><span><%= number_with_precision(@order.total.to_f.round(2), :precision=> 2 )%></span></td>
+    </tr>
+    <tr>
+      <th><span contenteditable>Total(in-words)</span></th>
+      <td><span data-prefix style="font-style: italic;"></span><span><%= @order.total.to_f.round(2)&.humanize&.titleize%></span></td>
+    </tr>
+  </table>
+
+  <table class="inventory">
+    <tr>
+      <th width="100px;"><span contenteditable>Bill To</span></th>
+      <td colspan="2" style="font-size: 14px;padding: 10px; border-top: 1px solid #ccc; border-bottom: 1px solid #ccc;">
+        <%= @billing_address&.full_address %>
+      </td>
+    </tr>
+    <tr>
+      <th width="100px;"><span contenteditable>Place of supply</span></th>
+      <td colspan="2" style="font-size: 14px;padding: 10px; border-top: 1px solid #ccc; border-bottom: 1px solid #ccc;">
+        <%= @shipping_address&.state %>
+      </td>
+    </tr>
+    <tr>
+      <th><span contenteditable>Ship To</span></th>
+      <td colspan="2" style="font-size: 14px;padding: 10px; border-top: 1px solid #ccc; border-bottom: 1px solid #ccc;">
+        <%= @shipping_address&.full_address %>
+      </td>
+    </tr>
+    <tr>
+      <th><span contenteditable>Payment Method</span></th>
+      <td colspan="2" style="font-size: 14px;padding: 10px; border-top: 1px solid #ccc; border-bottom: 1px solid #ccc;">
+        <%= @order&.source %>
+      </td>
+    </tr>
+  </table>
+  <div style="float: left;">
+    Authorised signatory
+  </div>
+</article>
+<div style="position: absolute; bottom: 55px; width: 85%;">
+  <p style="font-size: 20px; margin-bottom: 7px; text-align: center; left: 0px;">Thank You For Purchasing at <span style="font-weight: bold;"><%= brand_setting&.heading %></span></p>
+</div>
+<div style="position: absolute; bottom: 0px; width: 100%; padding: 10px; background: black; left: 0px;">
+  <div style="width: 100%">
+    <div style="width: 50%; float: left;">
+      <div>
+        <p style="font-size: 15px; margin-bottom: 7px;  color: white;"><span style="font-weight: bold;">Customer Care Email Id:</span> <%= admin_user&.email %></p>
+      </div>
+    </div>
+    <div style="width: 47%; float: left; padding-right: 10px; text-align: right;">
+      <div>
+        <p style="font-size: 15px; margin-bottom: 7px; color: white;"><span style="font-weight: bold;">Contact Number:</span> <%= brand_setting&.phone_number %>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
+
+<style type="text/css">
+  /* reset */
+
+  *
+  {
+    border: 0;
+    box-sizing: content-box;
+    color: inherit;
+    font-family: inherit;
+    font-size: inherit;
+    font-style: inherit;
+    font-weight: inherit;
+    line-height: inherit;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    text-decoration: none;
+    vertical-align: top;
+  }
+
+  /* content editable */
+
+  *[contenteditable] { border-radius: 0.25em; min-width: 1em; outline: 0; }
+
+  *[contenteditable] { cursor: pointer; }
+
+  *[contenteditable]:hover, *[contenteditable]:focus, td:hover *[contenteditable], td:focus *[contenteditable], img.hover { background: #DEF; box-shadow: 0 0 1em 0.5em #DEF; }
+
+  span[contenteditable] { display: inline-block; }
+
+  /* heading */
+
+  h1 { font: bold 100% sans-serif; letter-spacing: 0.5em; text-align: center; text-transform: uppercase; }
+
+  /* table */
+
+  table { font-size: 75%; table-layout: fixed; width: 100%; }
+  table { border-collapse: separate; border-spacing: 2px; }
+  th, td { border-width: 1px; padding: 0.5em; position: relative; text-align: left; }
+  th, td { border-radius: 0.25em; border-style: solid; }
+  th { background: #EEE; border-color: #BBB; }
+  td { border-color: #DDD; }
+
+  /* page */
+
+  html { font: 16px/1 'Open Sans', sans-serif; overflow: auto; padding: 0.5in; }
+  html { background: #999; cursor: default; }
+
+  body { box-sizing: border-box; height: 11in; margin: 0 auto; overflow: hidden; padding: 0.5in; width: 8.5in; }
+  body { background: #FFF; border-radius: 1px; box-shadow: 0 0 1in -0.25in rgba(0, 0, 0, 0.5); }
+
+  /* header */
+
+  header { margin: 0 0 3em; }
+  header:after { clear: both; content: ""; display: table; }
+
+  header h1 { background: #000; border-radius: 0.25em; color: #FFF; margin: 0 0 1em; padding: 0.5em 0; }
+  header address { float: left; font-size: 75%; font-style: normal; line-height: 1.25; margin: 0 1em 1em 0; }
+  header address p { margin: 0 0 0.25em; }
+  header span, header img { display: block; float: right; }
+  header span { margin: 0 0 1em 1em; max-height: 25%; max-width: 60%; position: relative; }
+  header img { max-height: 100%; max-width: 100%; }
+  header input { cursor: pointer; -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=0)"; height: 100%; left: 0; opacity: 0; position: absolute; top: 0; width: 100%; }
+
+  /* article */
+
+  article, article address, table.meta, table.inventory { margin: 0 0 3em; }
+  article:after { clear: both; content: ""; display: table; }
+  article h1 { clip: rect(0 0 0 0); position: absolute; }
+
+  article address { float: left; font-size: 125%; font-weight: bold; }
+
+  /* table meta & balance */
+
+  table.meta, table.balance { float: right; width: 36%; }
+  table.meta:after, table.balance:after { clear: both; content: ""; display: table; }
+
+  /* table meta */
+
+  table.meta th { width: 40%; }
+  table.meta td { width: 60%; }
+
+  /* table items */
+
+  table.inventory { clear: both; width: 100%; }
+  table.inventory th { font-weight: bold; text-align: center; }
+
+  table.inventory td:nth-child(1) { width: 26%; }
+  table.inventory td:nth-child(2) { width: 38%; }
+  table.inventory td:nth-child(3) { text-align: right; width: 12%; }
+  table.inventory td:nth-child(4) { text-align: right; width: 12%; }
+  table.inventory td:nth-child(5) { text-align: right; width: 12%; }
+
+  /* table balance */
+
+  table.balance th, table.balance td { width: 50%; }
+  table.balance td { text-align: right; }
+
+  /* aside */
+
+  aside h1 { border: none; border-width: 0 0 1px; margin: 0 0 1em; }
+  aside h1 { border-color: #999; border-bottom-style: solid; }
+
+  /* javascript */
+
+  .add, .cut
+  {
+    border-width: 1px;
+    display: block;
+    font-size: .8rem;
+    padding: 0.25em 0.5em;
+    float: left;
+    text-align: center;
+    width: 0.6em;
+  }
+
+  .add, .cut
+  {
+    background: #9AF;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    background-image: -moz-linear-gradient(#00ADEE 5%, #0078A5 100%);
+    background-image: -webkit-linear-gradient(#00ADEE 5%, #0078A5 100%);
+    border-radius: 0.5em;
+    border-color: #0076A3;
+    color: #FFF;
+    cursor: pointer;
+    font-weight: bold;
+    text-shadow: 0 -1px 2px rgba(0,0,0,0.333);
+  }
+
+  .add { margin: -2.5em 0 0; }
+
+  .add:hover { background: #00ADEE; }
+
+  .cut { opacity: 0; position: absolute; top: 0; left: -1.5em; }
+  .cut { -webkit-transition: opacity 100ms ease-in; }
+
+  tr:hover .cut { opacity: 1; }
+
+  @media print {
+    * { -webkit-print-color-adjust: exact; }
+    html { background: none; padding: 0; }
+    body { box-shadow: none; margin: 0; }
+    span:empty { display: none; }
+    .add, .cut { display: none; }
+  }
+
+  @page { margin: 0; }
+</style>

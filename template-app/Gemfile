@@ -1,0 +1,104 @@
+source 'https://rubygems.org'
+source 'https://gem.fury.io/engineerai'
+git_source(:github) { |repo| "https://github.com/#{repo}.git" }
+
+ruby '2.6.5'
+
+# Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
+# Use postgresql as the database for Active Record
+gem 'pg', '>= 0.18', '< 2.0'
+# Use Puma as the app server
+gem 'puma', '~> 4.1'
+# Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
+# gem 'jbuilder', '~> 2.7'
+# Use Active Model has_secure_password
+# gem 'bcrypt', '~> 3.1.7'
+
+# Use Active Storage variant
+# gem 'image_processing', '~> 1.2'
+
+# Use Rack CORS for handling Cross-Origin Resource Sharing (CORS), making cross-origin AJAX possible
+
+group :development, :test do
+  # Call 'byebug' anywhere in the code to stop execution and get a debugger console
+  gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
+end
+
+# Windows does not include zoneinfo files, so bundle the tzinfo-data gem
+gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
+gem 'studio_store_ecommerce_payment_razorpay', '0.0.8', require: 'bx_block_payment_razorpay'
+gem 'studio_store_ecommerce_stripe_integration', '0.0.8', require: 'bx_block_stripe_integration'
+gem 'studio_store_ecommerce_scheduling', '0.0.4', require: 'bx_block_scheduling'
+gem 'studio_store_ecommerce_share', '0.0.4', require: 'bx_block_share'
+gem 'studio_store_ecommerce_zipcode', '0.0.3', require: 'bx_block_zipcode'
+gem 'studio_store_ecommerce_shipping_charge', '0.0.5', require: 'bx_block_shipping_charge'
+gem 'studio_store_ecommerce_account', '0.0.21', require: 'account_block'
+gem 'studio_store_ecommerce_login', '0.0.6', require: 'bx_block_login'
+gem 'studio_store_ecommerce_forgot_password', '0.0.6', require: 'bx_block_forgot_password'
+gem 'studio_store_ecommerce_json_web_token', '0.0.2', require: 'builder_json_web_token'
+gem 'studio_store_ecommerce_help_center', '0.0.7', require: 'bx_block_help_center'
+gem 'studio_store_ecommerce_settings', '0.0.16', require: 'bx_block_settings'
+gem 'studio_store_ecommerce_notification_settings', '0.0.1', require: 'bx_block_notification_settings'
+gem 'studio_store_ecommerce_notification', '0.0.8', require: 'bx_block_notification'
+gem 'studio_store_ecommerce_order_management', '0.0.31', require: 'bx_block_order_management'
+gem 'studio_store_ecommerce_dashboard', '0.0.5', require: 'bx_block_dashboard'
+gem 'studio_store_ecommerce_catalogue', '0.0.32', require: 'bx_block_catalogue'
+gem 'studio_store_ecommerce_admin', '0.0.86', require: 'bx_block_admin'
+gem 'studio_store_ecommerce_banner', '0.0.11', require: 'bx_block_banner'
+gem 'studio_store_ecommerce_store_profile', '0.0.34', require: 'bx_block_store_profile'
+gem 'studio_store_ecommerce_api_configuration', '0.0.15', require: 'bx_block_api_configuration'
+gem 'studio_store_ecommerce_file_upload', '0.0.11', require: 'bx_block_file_upload'
+gem 'studio_store_ecommerce_social_media_account', '0.0.2', require: 'bx_block_social_media_account'
+gem 'studio_store_ecommerce_role_and_permission', '0.0.9', require: 'bx_block_role_and_permission'
+gem 'studio_store_ecommerce_interactive_faqs', '0.0.2', require: 'bx_block_interactive_faqs'
+gem 'studio_store_ecommerce_profile', '0.0.3', require: 'bx_block_profile'
+gem 'studio_store_ecommerce_sorting', '0.0.1', require: 'bx_block_sorting'
+gem 'studio_store_ecommerce_wishlist', '0.0.10', require: 'bx_block_wishlist'
+gem 'studio_store_ecommerce_filter_items', '0.0.9', require: 'bx_block_filter_items'
+gem 'studio_store_ecommerce_search', '0.0.6', require: 'bx_block_search'
+gem 'studio_store_ecommerce_categories_sub_categories', '0.0.18', require: 'bx_block_categories_sub_categories'
+gem 'studio_store_ecommerce_coupon_code_generator', '0.0.6', require: 'bx_block_coupon_code_generator'
+gem 'studio_store_ecommerce_cart', '0.0.12', require: 'bx_block_cart'
+gem 'studio_store_ecommerce_contact_us', '0.0.6', require: 'bx_block_contact_us'
+gem 'studio_store_ecommerce_fedex_integration', '0.0.2', require: 'bx_block_fedex_integration'
+gem 'studio_store_ecommerce_cors', '0.0.4', require: 'bx_block_cors'
+gem 'studio_store_ecommerce_email_notifications', '0.0.12', require: 'bx_block_email_notifications'
+gem 'builder_base', '0.0.53'
+group :development, :test do
+    gem 'rspec-sonarqube-formatter', '1.5.0'
+    gem 'rspec-rails', '5.1.2'
+    gem 'simplecov', '0.17.0'
+end
+
+group :test do
+  gem 'mock_redis', '0.34.0'
+end
+
+gem 'sidekiq_alive'
+gem 'sidekiq', '~> 6.1.0'
+
+gem "yabeda-prometheus"    # Base
+gem "yabeda-rails"         #API endpoint monitoring
+gem "yabeda-http_requests" #External request monitoring
+gem "yabeda-puma-plugin"
+gem 'yabeda-sidekiq'
+
+gem 'bx_block_cors'
+
+gem 'analytics-ruby', '~> 2.4.0', require: 'segment/analytics'
+gem "aws-sdk-s3", require: false
+gem 'wicked_pdf'
+gem 'json-jwt'
+gem 'ckeditor', '~> 4.2.2'
+gem 'haml'
+gem 'activeadmin-searchable_select'
+gem 'activeadmin_addons', '~> 1.8.2'
+gem 'activeadmin_quill_editor'
+gem 'arctic_admin'
+gem 'sassc-rails'
+gem 'activeadmin', '2.9.0'
+gem 'active_admin_role'
+gem 'activeadmin_json_editor'
+gem 'active_admin_datetimepicker'
+gem 'humanize'
+gem 'rack-cors'

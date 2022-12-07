@@ -1,0 +1,22 @@
+<script type="text/javascript">
+  (function() {
+  var app = {
+    launchApp: function() {
+      window.location.replace("<%= ENV['DL_APP_NAME'].to_s&.split('-')[0].to_s %>://product/<%= @catalogue.id %>");
+      this.timer = setTimeout(this.openWebApp, 1000);
+    },
+
+    openWebApp: function() {
+      if(navigator.userAgent.toLowerCase().indexOf("android") > -1){
+          window.location.href = "https://play.google.com/store/apps/details?id=com.whatsapp"
+      }else if(navigator.userAgent.toLowerCase().indexOf("iphone") > -1){
+          window.location.href = "https://apps.apple.com/in/app/whatsapp-messenger/id310633997"
+      }else{
+        window.location.href = "https://play.google.com/store/apps/details?id=com.whatsapp"
+      }
+    }
+  };
+
+  app.launchApp();
+})();
+</script>

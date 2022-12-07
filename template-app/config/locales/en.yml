@@ -1,0 +1,62 @@
+# Files in the config/locales directory are used for internationalization
+# and are automatically loaded by Rails. If you want to use locales other
+# than English, add the necessary files in this directory.
+#
+# To use the locales, use `I18n.t`:
+#
+#     I18n.t 'hello'
+#
+# In views, this is aliased to just `t`:
+#
+#     <%= t('hello') %>
+#
+# To use a different locale, set it with `I18n.locale`:
+#
+#     I18n.locale = :es
+#
+# This would use the information in config/locales/es.yml.
+#
+# The following keys must be escaped otherwise they will not be retrieved by
+# the default I18n backend:
+#
+# true, false, on, off, yes, no
+#
+# Instead, surround them with single quotes.
+#
+# en:
+#   'true': 'foo'
+#
+# To learn more, please read the Rails Internationalization guide
+# available at https://guides.rubyonrails.org/i18n.html.
+
+en:
+  hello: "Hello world"
+  active_admin:
+    powered_by: 'Powered by Builder.ai'
+    order_report: 'Order Report'
+  activerecord:
+    errors:
+      models:
+        user:
+          attributes:
+            email:
+              taken: 'is registered already.'
+
+  messages:
+    success:
+      created:    "%{resource} was created successfully"
+      updated:    "%{resource} was updated successfully"
+      deleted:    "%{resource} was deleted successfully"
+      cancelled:  "%{resource} was cancelled successfully"
+    orders:
+      notes:                   "Notes :-"
+      update_warning_message: "Are you sure you want to update order ? you won't able revert changes and order sub total will be deduct from customer's card. Coupon will also remove if its not fulfill any validations "
+      delivery_note_1:        "1. Mark as confirm - will deduct the amount from users accuont and create the delivery on postmate/fedex."
+      delivery_note_2:        "2. Cance order- will cancel the order and no payment would be deductsed, and no delivery would be created."
+      delivery_note_3:        "3. Edit order- you can change the address/ order detail if required, and incase their is any change in the payments you can update andh then mark as confirm, which would only deduct the amount as mentioned in system and then create an order in fedex/postmate."
+    after_payments:
+      internal_error: 'Payment is done successfully, but something internal error happen in system, please do refund of this order or deliver order'
+      status_fail: 'The payment has been failed due to some server issues, please try after some time or you could wait for sometime if money has been debited from your account.'
+    deliveries:
+      success:  "Order confirmed successfully and delivery created from %{deliver_by}"
+      failed:   'The payment has been done successfully but the delivery has not been created due to the following error received from Postmate/Fedex, please update the details and mark the order as confirm again. The payment won’t deduct again, only the delivery would be created.'

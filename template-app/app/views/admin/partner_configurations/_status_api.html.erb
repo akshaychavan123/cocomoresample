@@ -1,0 +1,13 @@
+<% if state.configuration_type == "razorpay" && ENV['RAZORPAY_ACCOUNT_ID'].present?%>
+  <% if @live_status == "processing"%>
+    <i id= "requested" class = "status"><%= "Processing"%></i>
+  <% elsif @live_status == "created" %>
+    <i id= "clarification" class = "status"><%="Created"%></i>
+  <% elsif @live_status == "activated" %>
+    <i id= "activated" class = "status"><%="Activated"%></i>
+  <% elsif @live_status.blank? || @live_status == "failed" %>
+    <i id= "pending" class = "status"><%="Failed"%></i>
+  <% end %>
+<% else %>
+  <%="n/a"%>
+<%end %>

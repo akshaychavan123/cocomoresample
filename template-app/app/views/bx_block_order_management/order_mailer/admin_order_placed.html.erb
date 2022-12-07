@@ -1,0 +1,9 @@
+<% if @content.present? %>
+  <% order_items_content = render :partial => 'order_item_table', :locals => {:order_items => @order.order_items, :order => @order } %>
+  <% content = @order.change_email_keywords(@content, order_items_content) %>
+  <%= content.html_safe %>
+<% else %>
+  <p>Hello Admin!</p>
+
+  <p>You have receied new order.</p>
+<% end %>

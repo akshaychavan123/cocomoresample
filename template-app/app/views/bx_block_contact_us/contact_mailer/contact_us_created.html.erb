@@ -1,0 +1,18 @@
+<% if @user.present? %>
+  <% if @content.present? %>
+    <% content = @admin_user.change_email_keywords(@content, customer: @user) %>
+    <%= content.html_safe %>
+  <% else %>
+    <p>Hello admin!</p>
+    <p>user <%= @user.email %> wants to contact you.</p>
+  <% end %>
+<% else %>
+  <p>Hello admin!</p>
+  <br/>
+  <p>New query has been submitted</p>
+
+  <p>Name: <%= @contact.name %></p>
+  <p>Email: <%= @contact.email %></p>
+  <p>Phone Number: <%= @contact.phone_number %></p>
+  <p>Query: <%= (@contact.description).html_safe %></p>
+<% end %>

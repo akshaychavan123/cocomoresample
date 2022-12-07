@@ -1,0 +1,5 @@
+<% if @brand_setting.present? %>
+  var heading = htmlDecode("<%= @brand_setting.heading.present? ? @brand_setting.heading : 'Your Store' %>");
+  $('.site_title').text(heading);
+  $('#login').find( "h2" ).text(heading);
+<% end %>

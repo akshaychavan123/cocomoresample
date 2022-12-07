@@ -1,0 +1,10 @@
+<% sub_steps = JSON.parse(step.step_completion) %>
+<% sub_steps.each do |key, value| %>
+	<label class="checkboxContainer show-arrow <%= "onboarding-#{key}" %>">
+		<%= key.humanize %>
+	  	<input type="checkbox" disabled <%= "checked" if value["completion"] %> value=<%= value["url"].gsub('//','/') %>>
+	  	<span class="checkmark"></span>
+		<span><i class="fas fa-arrow-right hide-arrow"></i></span>
+	</label>
+<% end %>
+

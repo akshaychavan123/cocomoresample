@@ -1,0 +1,9 @@
+<% if @content.present? %>
+  <% content = @user.change_email_keywords(@content, @email_otp, @product) %>
+  <%= content.html_safe %>
+<% else %>
+  <p>Hello <%= @user.email %>!</p>
+  <% entity =  @variant.present? ? "Product Variant" : "Product" %>
+  <p><%=entity%> is back in stock. You can buy now.</p>
+  <p>Product Name: <strong><%= @product.name %></strong> </p>
+<% end %>

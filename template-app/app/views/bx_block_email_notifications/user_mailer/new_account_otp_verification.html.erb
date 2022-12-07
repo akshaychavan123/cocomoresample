@@ -1,0 +1,8 @@
+<% if @content.present? %>
+  <% content = @email_otp.change_email_keywords(@content, @email_otp) %>
+  <%= content.html_safe %>
+<% else %>
+  <p>Hello <%= @email_otp&.email %>!</p>
+
+  <p>You have successfully signed up on our site.</p>
+<% end %>

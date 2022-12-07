@@ -1,0 +1,25 @@
+# == Schema Information
+#
+# Table name: catalogue_variants
+#
+#  id                         :bigint           not null, primary key
+#  catalogue_id               :bigint           not null
+#  price                      :decimal(, )
+#  stock_qty                  :integer
+#  on_sale                    :boolean
+#  sale_price                 :decimal(, )
+#  discount_price             :decimal(, )
+#  length                     :float
+#  breadth                    :float
+#  height                     :float
+#  created_at                 :datetime         not null
+#  updated_at                 :datetime         not null
+#  block_qty                  :integer
+#
+module BxBlockOrderManagement
+  class CatalogueVariant < BxBlockOrderManagement::ApplicationRecord
+    self.table_name = :catalogue_variants
+
+    belongs_to :catalogue, class_name: "BxBlockCatalogue::Catalogue"
+  end
+end

@@ -1,0 +1,35 @@
+<div class="col-md-4">
+	<% step_n = step.step %>
+	<% completed = step.completed? %>
+	<% black_background = (step_n == 3) ? (completed && BxBlockCatalogue::Catalogue.active.any?) : completed %>
+	<div class="box <%= "all_checked" if black_background %>">
+		<div class="top_view">
+			<span class="numberCircle"><%= step_n %></span>
+			<h2><%= step.title %></h2>
+		</div>
+		<hr />
+		<% unless step_n == 3 %>
+			<div class="checkbox_view">
+			<%= render :partial => "onboarding_substeps", locals: { step: step } %>
+			</div>
+		<% else %>
+			<% if completed %>
+				<% case BxBlockCatalogue::Catalogue.active.count %>
+				<% when 0 %>
+					<a href=<%= new_admin_product_path %> class="step_btn">
+						Add product
+					</a>
+				<% else %>
+					<a href=<%= new_admin_product_path %> class="step_btn outline">
+						Add more products
+					</a>
+				<% end %>
+			<% else %>
+				<div class="checkbox_view">
+				<%= render :partial => "onboarding_substeps", locals: { step: step } %>
+				</div>
+			<% end %>
+		<% end %>
+	</div>
+</div>
+

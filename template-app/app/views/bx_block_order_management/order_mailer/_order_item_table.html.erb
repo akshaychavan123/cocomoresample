@@ -1,0 +1,140 @@
+<tr>
+  <td style="border: 1px solid #ccc">
+    <table width="100%" cellpadding="0" cellspacing="0" style="padding: 0 0 16px 0;">
+      <tbody>
+      <tr>
+        <td colspan="3" style="font-size: 14px;padding: 10px;border-bottom: 1px solid #ccc;">
+          <strong>Order Details</strong>
+        </td>
+      </tr>
+      <tr>
+        <td style="font-size: 14px;padding: 10px 0 5px 10px;">
+          Order#<strong> <%= order.order_number %></strong>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="3" style="font-size: 14px;padding: 0 0px 10px 10px;">
+          Placed on <%= order.placed_at&.in_time_zone(ENV['TIME_ZONE'])&.strftime("%a, #{order.placed_at&.in_time_zone(ENV['TIME_ZONE'])&.day&.ordinalize} %B %Y - %I:%M %p") %>
+        </td>
+      </tr>
+      <% order_items.each do |order_item| %>
+        <% catalogue = order_item.catalogue %>
+        <% catalogue_variant = order_item&.catalogue_variant %>
+        <tr>
+          <td valign="center" style="width: 33.333%;padding:16px;">
+            <%#= catalogue.present? ? (catalogue.attachments&.first&.present? ? image_tag(url_for(catalogue.attachments&.first&.image), width: "50", height:"50") : content_tag(:span, 'no image yet')) : '' %>
+            <%= order_item.catalogue_variant.present? ? (order_item.catalogue_variant.attachments&.first&.present? ? image_tag(url_for(order_item.catalogue_variant.attachments&.first&.image), width: "50", height:"50") : content_tag(:span, 'no image yet')) : (catalogue.attachments.first&.present? ? image_tag(url_for(catalogue.attachments&.first&.image), width: "50", height:"50") : content_tag(:span, 'no image yet')) %>
+          </td>
+          </td>
+
+          <td style="width: 33.333%;padding:16px;">
+            <table cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <th  align="left" valign="top" style="border:none;background:transparent;padding:5px;">
+                  <span style="font-size:14px;font-weight:500;text-transform:capitalize;color: #4d4d4d;"><%= catalogue.name %> </span>
+                </th>
+              </tr>
+              <tr>
+                <th width="50" align="left" valign="top" style="border:none;background:transparent;padding:5px;">
+                    <span style="font-size:14px;font-weight:600;text-transform:capitalize;color: #4d4d4d;">
+                    SKU:
+                  </span>
+                </th>
+                <td align="left" valign="top" style="border:none;padding:5px;">
+                    <span style="font-size:14px;font-weight:500;text-transform:capitalize;color: #4d4d4d;">
+                      <%= catalogue.sku %>
+                    </span>
+                </td>
+              </tr>
+              <tr>
+                <th width="50%" align="left" valign="top" style="border:none;background:transparent;padding:5px;">
+                    <span style="font-size:14px;font-weight:600;text-transform:capitalize;color: #4d4d4d;">
+                      QTY:
+                    </span>
+                </th>
+                <td align="left" valign="top" style="border:none;padding:5px;">
+                    <span style="font-size:14px;font-weight:500;text-transform:capitalize;color: #4d4d4d;">
+                      <%= order_item.quantity %>
+                    </span>
+                </td>
+              </tr>
+              <% if order_item.catalogue_variant_id.present? %>
+                <% catalogue_variant = BxBlockCatalogue::CatalogueVariant.find_by(id: order_item.catalogue_variant_id) %>
+                <tr>
+                  <% catalogue_variant.catalogue_variant_properties.each do |property| %>
+                    <th width="50" align="left" valign="top" style="border:none;background:transparent;padding:5px;">
+                        <span style="font-size:14px;font-weight:600;text-transform:capitalize;color: #4d4d4d;">
+                            <%= BxBlockCatalogue::Variant.find(property.variant_id).name %>
+                        </span>
+                    </th>
+                    <td align="left" valign="top" style="border:none;padding:5px;">
+                        <span style="font-size:14px;font-weight:500;text-transform:capitalize;color: #4d4d4d;">
+                          <%= BxBlockCatalogue::VariantProperty.find(property.variant_property_id).name %>
+                        </span>
+                    </td>
+                  <% end %>
+                </tr>
+              <% end%>
+            </table>
+          </td>
+          <td valign="top" align="right" style="width: 33.333%;padding:16px;">
+              <span style="font-size:14px;font-weight:600;text-transform:capitalize;color: #4d4d4d;">
+              <%= order_item.total_price %>
+            </span>
+          </td>
+        </tr>
+      <% end %>
+      <tr>
+        <td colspan="3" style="padding-top: 10px;">
+          <span style="height: 1px; background-color: #ccc;display: block;"></span>
+        </td>
+      </tr>
+      <tr>
+        <th colspan="2" align="right" style="font-size:14px;font-weight:600;text-transform:capitalize;color: #666;">Subtotal: </th>
+        <td width="100" align="right" style="padding: 5px"><%= order.sub_total.to_f %></td>
+      </tr>
+      <tr>
+        <th colspan="2" align="right" style="font-size:14px;font-weight:600;text-transform:capitalize;color: #666;">Shipping & Handling: </th>
+        <td width="100" align="right" style="padding: 5px"><%= order&.shipping_total.to_f%></td>
+      </tr>
+      <tr>
+        <th colspan="2" align="right" style="font-size:14px;font-weight:600;text-transform:capitalize;color: #666;">Tax:</th>
+        <td width="100" align="right" style="padding: 5px"><%= order&.total_tax.to_f %></td>
+      </tr>
+      <tr>
+        <th colspan="2" align="right" style="font-size:14px;font-weight:600;text-transform:capitalize;color: #666;">Discount(15% off Registered Customer):</th>
+        <td width="100" align="right" style="padding: 5px">-<%= order&.applied_discount.to_f %></td>
+      </tr>
+      <tr>
+        <th colspan="2" align="right" style="font-size:14px;font-weight:600;text-transform:capitalize;color: #666;">Grand Total:</th>
+        <td width="100" align="right" style="padding: 5px"><%= order&.total.to_f %></td>
+      </tr>
+      <tr>
+        <td style="font-size: 14px;padding: 10px;border-top: 1px solid #ccc; border-bottom: 1px solid #ccc">
+          <strong>Bill To:</strong>
+        </td>
+        <td colspan="2" style="font-size: 14px;padding: 10px; border-top: 1px solid #ccc; border-bottom: 1px solid #ccc;">
+          <%= @billing_address&.full_address %>
+        </td>
+      </tr>
+      <tr>
+        <td style="font-size: 14px;padding: 10px;border-top: 1px solid #ccc; border-bottom: 1px solid #ccc">
+          <strong>Ship To:</strong>
+        </td>
+        <td colspan="2" style="font-size: 14px;padding: 10px; border-top: 1px solid #ccc; border-bottom: 1px solid #ccc;">
+          <%= @shipping_address&.full_address %>
+        </td>
+      </tr>
+      <tr>
+        <td style="font-size: 14px;padding: 10px;border-top: 1px solid #ccc; border-bottom: 1px solid #ccc">
+          <strong>Payment Method:</strong>
+        </td>
+        <td colspan="2" style="font-size: 14px;padding: 10px; border-top: 1px solid #ccc; border-bottom: 1px solid #ccc;">
+          <%= order&.source %>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+
+  </td>
+</tr>

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    .list-unstyled.multi-steps{
+      margin: 0;
+      padding: 0;
+    }
+    .step-bar{
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      padding: 15px
+    }
+    .multi-steps > li.is-active ~ li:before, .multi-steps > li.is-active:before {
+      font-family: inherit;
+      font-weight: 700;
+    }
+    .multi-steps > li.is-active ~ li:after, .multi-steps > li.is-active:after {
+      background-color: #ededed;
+    }
+    .multi-steps {
+      display: table;
+      table-layout: fixed;
+      width: 100%;
+      text-align: left;
+    }
+    .multi-steps > li {
+      text-align: left;
+      display: table-cell;
+      position: relative;
+    }
+    .multi-steps > li a{
+      color: #444;
+      font-weight: bold;
+      font-size: 12px;
+      text-decoration: none;
+    }
+    .multi-steps > li a:hover{
+      text-decoration: none;;
+    }
+    .multi-steps > li:before {
+      content: "";
+      content: "✓;";
+      content: "𐀃";
+      content: "𐀄";
+      content: "✓";
+      display: block;
+      background-color: #03ad17;
+      width:24px;
+      height: 24px;
+      line-height: 24px;
+      text-align: center;
+      font-weight: bold;
+      border-width: 2px;
+      border-style: solid;
+      border-color: #03ad17;
+      border-radius: 50%;
+      color: #ffffff;
+      position: relative;
+      z-index: 9;
+    }
+    .multi-steps > li:after {
+      content: "";
+      height: 2px;
+      width: 100%;
+      background-color: #03ad17;
+      position: absolute;
+      top: 12px;
+      left: 0%;
+      z-index: 1;
+    }
+    .multi-steps > li:last-child:after {
+      display: none;
+    }
+    .multi-steps > li.is-active:before {
+      background-color: #03ad17;
+      border-color: #03ad17;
+    }
+    .multi-steps > li.is-active ~ li {
+      color: #808080;
+    }
+    .multi-steps > li.is-active ~ li:before {
+      background-color: #ededed;
+      border-color: #ededed;
+      content: '-';
+    }
+    .container-fluid {
+      max-width: 100%;
+      padding-left: 15px;
+      padding-right: 15px;
+      margin-left: auto;
+      margin-right: auto;
+      margin-bottom: 20px;
+    }
+    .bar-title{
+      margin-top: 0;
+    }
+  </style>
+</head>
+<body>
+<div class="container-fluid ">
+  <div class="step-bar">
+    <% onboarding_requirement = {} %>
+    <% if !(BxBlockStoreProfile::BrandSetting.count > 0) %>
+      <% brand_url = "brand_settings" %>
+    <% elsif !(BxBlockCatalogue::CatalogueVariant.count > 0) %>
+      <% brand_url = "variants" %>
+    <% elsif !(BxBlockCatalogue::Tag.count > 0) %>
+      <% brand_url = "tags" %>
+    <% elsif !(BxBlockCatalogue::Brand.count > 0) %>
+      <% brand_url = "brands" %>
+    <% else %>
+      <% brand_url = "brand_settings" %>
+    <% end %>
+    <% onboarding_requirement["Brand Setting*"] = [BxBlockStoreProfile::BrandSetting.count > 0 && BxBlockCatalogue::CatalogueVariant.count > 0 && BxBlockCatalogue::Tag.count > 0 && BxBlockCatalogue::Brand.count > 0, brand_url] %>
+    <% onboarding_requirement["Banners*"] = [BxBlockBanner::Banner.where(web_banner: false).present? && BxBlockBanner::Banner.where(web_banner: true).present?, !BxBlockBanner::Banner.where(web_banner: false).present? ? "app_banners" : "web_banners"] %>
+    <% onboarding_requirement["Categories*"] = [BxBlockCategoriesSubCategories::Category.count > 0 && BxBlockCategoriesSubCategories::SubCategory.count> 0, "categories"] %>
+    <% onboarding_requirement["Taxes*"] = [BxBlockOrderManagement::Tax.count > 0, "taxes"] %>
+    <% onboarding_requirement["Shipping Charges*"] = [BxBlockShippingCharge::ShippingCharge.count>0 && BxBlockZipcode::Zipcode.count>0, "shipping_charges"] %>
+
+    <!-- logistic partner-->
+    <% logistic_partner = BxBlockStoreProfile::BrandSetting.first&.country == "india" ? "Shiprocket" : "Logistic" %>
+    <% if logistic_partner == "Shiprocket" %>
+      <% partner = BxBlockApiConfiguration::ApiConfiguration.where(configuration_type: "shiprocket").present? %>
+    <% elsif logistic_partner == "Logistic"%>
+      <% partner = BxBlockApiConfiguration::ApiConfiguration.where(configuration_type: "525k").present? %>
+    <% end %>
+    <% onboarding_requirement[logistic_partner] = [partner, "api_configurations"] %>
+    <!-- payment gateway-->
+    <% payment_gateway = BxBlockStoreProfile::BrandSetting.first&.country == "india" ? "Razorpay" : "Stripe" %>
+    <% if payment_gateway == "Razorpay" %>
+      <% payment = BxBlockApiConfiguration::ApiConfiguration.where(configuration_type: "razorpay").present? %>
+    <% elsif payment_gateway == "Stripe"%>
+      <% payment = (BxBlockApiConfiguration::ApiConfiguration.where(configuration_type: "stripe")).present? %>
+    <% end %>
+    <% onboarding_requirement[payment_gateway] = [payment, "api_configurations"] %>
+    <% onboarding_requirement["Products*"] = [BxBlockCatalogue::Catalogue.active.count > 0, "products"] %>
+    <% onboarding_requirement["App Store Configurations*"] = [BxBlockApiConfiguration::AppSubmissionRequirement.count>0, "app_submission_requirements"] %>
+    <% onboarding_requirement["Is Website Up?"] = [BxBlockDashboard::Dashboard.is_website_up? != nil ? true : false, BxBlockDashboard::Dashboard.is_website_up? != nil ? BxBlockDashboard::Dashboard.is_website_up? : "dashboard"] %>
+    <!-- sorting -->
+    <% true_hash = {} %>
+    <% false_hash = {} %>
+    <% onboarding_requirement.each do |key,value| %>
+      <% if value[0]==true %>
+        <% true_hash[key]=value %>
+      <% else %>
+        <% false_hash[key]=value %>
+      <% end %>
+    <% end %>
+
+    <% if true_hash.length == 0 %>
+      <h3 class="bar-title">Few steps needed to go live</h3>
+      <ul class="list-unstyled multi-steps">
+        <li class="is-active" style="display:none"></li>
+        <% false_hash.each do |key, value| %>
+          <li>
+            <%= link_to key, send("admin_#{value[1]}_path") %>
+          </li>
+        <% end %>
+      </ul>
+    <% else %>
+      <h3 class="bar-title">Few steps needed to go live</h3>
+      <ul class="list-unstyled multi-steps">
+        <% index = 1 %>
+        <% true_hash.each do |key, value| %>
+          <li class= "<%= index >= true_hash.length ? 'is-active' : '' %>">
+            <% if key == "Is Website Up?" %>
+              <%= link_to key, "https://#{value[1]}", target: "_blank" %>
+            <% else %>
+              <%= link_to key, send("admin_#{value[1]}_path") %>
+            <% end %>
+          </li>
+          <% index += 1 %>
+        <% end %>
+        <% false_hash.each do |key, value| %>
+          <li>
+            <%= link_to key, send("admin_#{value[1]}_path") %>
+          </li>
+        <% end %>
+      </ul>
+    <% end %>
+  </div>
+</div>
+</body>
+</html>

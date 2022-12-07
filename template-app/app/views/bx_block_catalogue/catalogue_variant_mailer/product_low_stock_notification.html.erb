@@ -1,0 +1,10 @@
+<% if @content.present? %>
+  <% content = @admin_user.change_email_keywords(@content, customer: nil, product: @product, variant: @variant) %>
+  <%= content.html_safe %>
+<% else %>
+  <p>Dear <strong><%= @admin_user.email %></strong>,</p>
+  <% qty = @variant.present? ? @variant.stock_qty.to_s : @product&.stock_qty.to_s %>
+  <p>You have only <strong><%= qty %></strong> units of <strong><%= @product.name %></strong> left in your inventory</p>
+  <p> Replenish your inventory now to offer a seamless shopping experience to your customers. </p>
+  <p>Warm Regards,<br>Team Builder</p>
+<% end %>

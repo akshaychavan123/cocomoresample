@@ -1,0 +1,46 @@
+<%= form_for :order_report, url: admin_order_report_path, method: :get, class: "filter_form" do |f| %>
+<div class="filter_form_field">
+  <%=f.label "From Date"%>
+  <%= f.text_field :from, id:'from_date',  class: 'hasDatetimePicker', required:true %>  
+</div>
+<div class="filter_form_field">
+
+  <%=f.label "To Date"%>
+  <%= f.text_field :to, id:"to_date", class: 'hasDatetimePicker', required:true %>
+  </div>
+
+    <div class="buttons">
+    <input type="submit" name="commit" value="Filter">
+    <a class="clear_filters_btn" href="/admin/Calendar">Clear Filters</a>
+  </div>
+
+<% end %>
+
+
+<script type="text/javascript">
+  
+var data = {
+  format: 'd/m/Y', //date format
+  scrollInput: false, // stops scrolling through dates on hover
+  autoclose: true,
+  timepicker: false //hide time
+};
+
+const $in = $('#from_date'),
+  $out = $('#to_date');
+$in.datetimepicker(data);
+$out.datetimepicker(data);
+$in.on('change', function() {
+  var minDate = $in.val();
+  if (minDate) {
+    minDate = minDate.split('/');
+    console.log(minDate);
+    minDate = new Date(minDate[2], minDate[1] - 1, minDate[0], 0, 0);
+  } else {
+    minDate = new Date(0, 0, 0, 0, 0);
+  }
+  data.minDate = minDate;
+  $out.datetimepicker(data);
+});
+
+</script>

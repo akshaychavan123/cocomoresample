@@ -1,0 +1,48 @@
+<div id="total_status_view" class="total_status_view">
+	<div class="row">
+		<div class="col-sm-8">
+			<h3 class="bar-title">
+				<% if steps_completed == total_steps %>
+					<%= "You’re ready to start selling!" %>
+				<% elsif steps_completed > 0 %>
+					<%= "You’re off to a great start!" %>
+				<% else %>
+					<%= "Let’s get your store ready" %>
+				<% end %>
+			</h3>
+			<h5><%= steps_completed %> of <%= total_steps %> tasks completed</h5>
+		</div>
+		<div class="col-sm-4">
+			<div class="onboardview">
+				<%= render :partial => "onboarding_steps_percent", locals: { percent: percent } %>
+				<% if percent == 100 %>
+					<div class="btn_group">
+						<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-three-dots-vertical dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" viewBox="0 0 16 16">
+						<path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
+						</svg>
+						<div class="dropdown-menu">
+							<a class="dropdown-item" href=<%= onboarding_dismiss_path %>>Dismiss Tasks</a>
+						</div>
+					</div>
+				<% end %>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div id="onboarding_step" class="row">
+	<%= render :partial => "onboarding_step", :collection => steps, :as => :step %>
+</div>
+
+
+<script type="text/javascript">
+	$('.checkboxContainer').click(function(){
+		redirectTo(this.getElementsByTagName('input')[0].value);
+	});
+
+	function redirectTo(url) {
+	  window.location.href = window.location.origin + url;
+	  return;
+	}
+</script>
+

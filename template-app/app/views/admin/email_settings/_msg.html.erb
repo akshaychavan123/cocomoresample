@@ -1,0 +1,5 @@
+<p id="bulk_upload_error_msg" style="color:red;display:none;font-size:14px;font-weight:400;margin-top:-20px;">Total file size is greater than 50 MB</p>
+<%= button_tag t('submit'), class: "btn btn-primary",value:"Create Bulk image",id: "bulk_upload_submit_button", data: {disable_with: "<span class='spinner'></span> Uploading..".html_safe} %>
+<div class="uploadwarningmsg">
+  *You can add multiple images using this option. Total file size should be less than 50 MB per upload.
+</div>

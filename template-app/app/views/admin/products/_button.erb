@@ -1,0 +1,242 @@
+<div id="bulkuploadModal" class="custommodal">
+  <div class="custommodal-content">
+    <div class="custommodal-header">
+      <div class="tab" style="display:flex;flex:2;border-bottom:1px #ccc solid;">
+        <div class="tablinks btn add" style="display:flex;" id="defaultTab" onclick="openCity(event, 'SelectImage')">
+          <i style="margin:0px 4px" class="fa fa-pager gray-icon"></i><span>Select image</span>
+        </div>
+        <div style="display:flex;" class="tablinks btn edit" onclick="openCity(event, 'UploadImage')">
+          <i style="margin:0px 4px" class="fa fa-upload"></i><span>Upload image</span>
+        </div>
+      </div>
+      <div id="searchBoxContainer" style="flex:1">
+        <input class="searchBox" id="searchImage" type="search" placeholder="Search..." />
+      </div>
+    </div>
+    <div class="custommodal-body">
+      <div id="SelectImage" class="tabcontent">
+        <div class="flex-container" id="bulk-image-list-conaioner">
+
+        </div>
+        <div id="noImage" style="display:none">
+          <p style="font-size:18px;font-weight:bold;margin:4px">No images uploaded yet</p>
+          <%= link_to "Go to upload","/admin/bulk_uploads/new" %>
+        </div>
+        <div class="center">
+          <div class="paginationbulk"></div>
+        </div>
+      </div>
+      <div id="UploadImage" class="tabcontent drop-area">
+        <div style="position: absolute;top: 50%;left: 50%;transform: translate(-50%, -50%);">
+          <div style="text-align: center">
+            <h1 style="text-align: center">Drag photo here</h1>
+            <p style="text-align: center">Or</p>
+            <input type="file" accept="image/*"  id="file1" class="cropper" style="display: none"/>
+            <button    onclick="openFileOption(event);" class="uploadButton">
+              Choose photo
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="uploadfooter" class="custommodal-footer">
+      <span type="button" onclick="closeDialog(event)" class="cancelbutton">Cancel</span>
+      <button type="button" onclick="selectImage(event)" id="selectImageButton" class="buttonprimary disableButton">Select</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  var totalData = [];
+  var currentPage = 1;
+  const limit = 20;
+  var total = 0;
+  var isSearch = false;
+  function closeDialog() {
+    currentPage = 1;
+    $("#searchImage").val('');
+    $("#bulkuploadModal").css("display", "none")
+  }
+
+  function openFileOption(e)
+
+  {
+    e.stopPropagation();
+    e.preventDefault()
+    if(e.pointerType === "mouse"){
+      document.getElementById("file1").click();
+    }
+  }
+
+  function openCity(evt, cityName) {
+    evt.preventDefault()
+    if(cityName !== 'UploadImage'){
+      $("#uploadfooter").css("display","block")
+      $("#searchBoxContainer").css("display","block")
+    } else {
+      $("#uploadfooter").css("display","none")
+      $("#searchBoxContainer").css("display","none")
+    }
+    var i, tabcontent, tablinks;
+    tabcontent = document.getElementsByClassName("tabcontent");
+    for (i = 0; i < tabcontent.length; i++) {
+      tabcontent[i].style.display = "none";
+    }
+    tablinks = document.getElementsByClassName("tablinks");
+    for (i = 0; i < tablinks.length; i++) {
+      tablinks[i].className = tablinks[i].className.replace(" active", "");
+    }
+    document.getElementById(cityName).style.display = "flex";
+    if(cityName !== 'UploadImage'){
+      document.getElementById(cityName).style["align-items"] = "center";
+      document.getElementById(cityName).style["justify-content"] = "center";
+      document.getElementById(cityName).style["text-align"] = "center";
+    }
+    evt.currentTarget.className += " active";
+  }
+
+  function paginate(array, page_size, page_number) {
+    // human-readable page numbers usually start with 1, so we reduce 1 in the first argument
+    createList(array.slice((page_number - 1) * page_size, page_number * page_size));
+  }
+
+  function paginate11(event) {
+    currentPage++
+    createList(totalData.slice((currentPage - 1) * limit, currentPage * limit));
+  }
+
+  function createList(data) {
+    var ret = '';
+    if(data.length > 0){
+      $.each(data, function(index, product) {
+        ret += `<div class="image-container11">
+                  <img  src="${product}"  alt="Banners" />
+                  <i  class="fa fa-check hiddenselectedicon selectedicon"></i>
+                </div>`
+      });
+      $("#bulk-image-list-conaioner").append(ret)
+    }
+  }
+
+  function debounce(func, timeout = 300){
+    let timer;
+    return (...args) => {
+      clearTimeout(timer);
+      timer = setTimeout(() => { func.apply(this, args); }, timeout);
+    };
+  }
+
+  async function getImages(name,page_number) {
+    let url = `${window.location.origin}/admin/bulk_uploads/list_of_images?page=${page_number}`
+    if(name){
+      url += "&name="+name;
+    }
+    fetch(url)
+      .then(response => response.json())
+      .then(data => {
+        totalData = data.image_urls;
+        var total = data.image_urls.length;
+        if(isSearch === true){
+          setTimeout(()=>{
+            isSearch = false;
+          },500)
+        }
+        if(name && totalData.length == 0){
+          $("#bulk-image-list-conaioner").css('display',"none");
+          $("#noImage").css('display',"block");
+          document.getElementById("SelectImage").style.display = "flex";
+          return false;
+        } else if(name) {
+          $("#bulk-image-list-conaioner").html("");
+          document.getElementById("SelectImage").style.display = "block";
+          createList(data.image_urls);
+          return false;
+        }
+        if(page_number == 1 && totalData.length == 0){
+          $("#bulk-image-list-conaioner").css('display',"none");
+          $("#noImage").css('display',"block");
+          return false;
+        } else {
+          $("#bulk-image-list-conaioner").css('display',"flex");
+          $("#noImage").css('display',"none");
+          createList(data.image_urls)
+        }
+
+        // (paginate(data.image_urls, limit, currentPage))
+      })
+      .catch(err => console.log(err))
+  }
+
+
+
+
+
+  function preventDefaults(e) {
+    e.preventDefault()
+    e.stopPropagation()
+  }
+  $(document).ready(function() {
+    document.getElementById("defaultTab").click();
+    var dropArea = document.querySelector('.tabcontent.drop-area')
+    $('.flex-container').on('scroll', function(event) {
+      event.preventDefault();
+
+      let div = $(this).get(0);
+      if(div.scrollTop + div.clientHeight >= (div.scrollHeight -5)) {
+        currentPage++;
+        // debounce(() => getImages($('input[type=search]').val(),currentPage));
+        if(isSearch === false){
+          getImages($('input[type=search]').val(),currentPage)
+        }
+      }
+    });
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+      dropArea.addEventListener(eventName, preventDefaults, false)
+    })
+    $('input[type=search]').on('search', function (e) {
+      e.stopPropagation()
+      e.stopImmediatePropagation();
+      currentPage = 1;
+      isSearch = true;
+      createList([])
+      $("#bulk-image-list-conaioner").html("");
+      getImages($(this).val(),currentPage);
+    });
+    ['dragenter', 'dragover'].forEach(eventName => {
+      dropArea.addEventListener(eventName, function highlight(e) {
+        dropArea.classList.add('highlight')
+      }, false)
+    })
+
+    dropArea.addEventListener('drop', handleDrop, false)
+
+    //getImages("",currentPage)
+
+    function onChangeElement1(qSelector, cb) {
+      const targetNode = document.querySelector(qSelector);
+      if (targetNode) {
+        const config = {
+          attributes: true,
+          childList: false,
+          subtree: false
+        };
+        const callback = function(mutationsList, observer) {
+          cb($(qSelector))
+        };
+        const observer = new MutationObserver(callback);
+        observer.observe(targetNode, config);
+      } else {
+        console.error("onChangeElement: Invalid Selector")
+      }
+    }
+    onChangeElement1('#bulkuploadModal', function(jqueryElement) {
+      if ($("#bulkuploadModal").css("display") === 'none') {
+        document.getElementById("defaultTab").click();
+        $(".image-container11 img").removeClass("selectedImage");
+        $(".image-container11 .selectedicon").removeClass("showselectedicon");
+      }
+    })
+
+
+  })
+</script>

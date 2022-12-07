@@ -1,0 +1,24 @@
+<div id="productCropper" class="custommodal">
+  <div class="custommodal-content">
+    <div class="custommodal-header" style="16px 16px 0px 16px;display:flex;justify-content: space-between;">
+      <h2 class="modal-title" style="cursor:pointer;" id="exampleModalLabel">Back To Selection</h2>
+      <div>
+        <button type="button" class="iconButton" id= 'zoomin'>
+          <i class="fas fa-search-plus"></i>
+        </button>
+        <button type="button" class="iconButton" id= 'zoomout'>
+          <i class="fas fa-search-minus"></i>
+        </button>
+      </div>
+    </div>
+    <div class="custommodal-body">
+      <div class="image-container" >
+        <img id="croppableImage" style="max-height: 550px;" src="">
+      </div>
+    </div>
+    <div class="custommodal-footer">
+      <span type="button" onclick="closeCroperDialog(event)" class="cancelbutton">Cancel</span>
+      <button type="button" id= 'replaceCroppedImage' class="buttonprimary">Crop</button>
+    </div>
+  </div>
+</div>

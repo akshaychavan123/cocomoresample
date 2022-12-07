@@ -1,0 +1,17 @@
+a = $("#<%= params[:element_id] %>").closest("fieldset").find('select').not( '[id="<%= params[:element_id] %>"]' )
+
+a.empty()
+<% @variant_properties.each do |attr| %>
+var option = $("<option data-variant=<%= attr.id %>></option>").attr("value", "<%= attr.id %>").text("<%= attr.name %>");
+a.append(option);
+<% end %>
+
+data_html = $("#<%= params[:element_id] %>").closest('fieldset').find('.has_many_add').data('html')
+dom_nodes = $($.parseHTML(data_html));
+select  = dom_nodes.find('select')
+select.empty()
+<% @variant_properties.each do |attr| %>
+var option = $("<option data-variant=<%= attr.id %>></option>").attr("value", "<%= attr.id %>").text("<%= attr.name %>");
+select.append(option);
+<% end %>
+$("#<%= params[:element_id] %>").closest('fieldset').find('.has_many_add').data('html', dom_nodes.get(0).outerHTML)

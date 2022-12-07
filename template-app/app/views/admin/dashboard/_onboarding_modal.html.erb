@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+  <title>Onboarding</title>
+</head>
+
+<body>
+  <div class="container">
+    <div id="onboardingModal" role="dialog" class="modal fade custom_steps_modal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title"><%= onboarding&.title %></h1>
+            <h4><%= onboarding&.description %></h4>
+          </div>
+          <div class="modal-body">
+            <div class="row">
+              <%= render :partial => "onboarding_modal_step", :collection => steps, :as => :step %>
+            </div>
+          </div>
+          <div class="text-right">
+            <button type="button" data-dismiss="modal" class="btn btn_start">Start</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="text/javascript" src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+  <script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function(){
+      if(document.referrer.includes('/admin/login') && !([1,2].includes(performance.navigation.type))){
+        $('#onboardingModal').modal('show');
+      }
+    });
+  </script>
+</body>
+
+</html>
+

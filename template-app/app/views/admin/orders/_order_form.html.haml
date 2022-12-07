@@ -1,0 +1,22 @@
+- f.inputs "Order Details" do
+  - f.input :account_id, as: :select, collection: AccountBlock::Account.all.where.not(type: 'guest_account').map { |u| [u.email, u.id] }, include_blank: false, input_html: { class: 'select2' }
+  - f.input :order_date, as: :datepicker
+  - f.input :is_gift
+
+- f.inputs 'Order Items' do
+  - f.has_many :order_items, heading: false, allow_destroy: true, new_record: 'Add New Order Item' do |oi_form|
+    - oi_form.input :catalogue, collection: BxBlockCatalogue::Catalogue.active.map { |u| [u&.name, u.id] }, include_blank: false, input_html: { class: 'select2 product_item' }
+    - oi_form.input :quantity, input_html: { class: 'item_quantity' }
+    - oi_form.input :unit_price, input_html: { readonly: true, class: 'item_unit_price' }
+    - oi_form.input :total_price, input_html: { readonly: true, class: 'item_total_price' }
+
+- f.inputs 'Delivery Address', for: [:delivery_address, BxBlockOrderManagement::DeliveryAddress.new] do |da|
+  - da.input :name, input_html: { name: 'order[delivery_addresses_attributes][0][name]'}
+  - da.input :flat_no, input_html: { name: 'order[delivery_addresses_attributes][0][flat_no]'}
+  - da.input :address, input_html: { name: 'order[delivery_addresses_attributes][0][address]'}
+  - da.input :zip_code, input_html: { name: 'order[delivery_addresses_attributes][0][zip_code]'}
+  - da.input :phone_number, input_html: { name: 'order[delivery_addresses_attributes][0][phone_number]'}
+  - da.input :city, input_html: { name: 'order[delivery_addresses_attributes][0][city]'}
+  - da.input :state, input_html: { name: 'order[delivery_addresses_attributes][0][state]'}
+  - da.input :country, input_html: { name: 'order[delivery_addresses_attributes][0][country]'}
+- f.actions
