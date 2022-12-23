@@ -107,8 +107,8 @@ Rails.application.configure do
   config.action_mailer.smtp_settings = {
     address:              'email-smtp.us-east-1.amazonaws.com',
     port:                 '587',
-    user_name:            'AKIA2YL6V6FWQSILDMHQ',
-    password:             'BHhAgQJvJqwgl2AUZ8a8RS+wfpuoyxWxyO5TPt7csGpb',
+    user_name:            'AKIA2YL6V6FWQO3Q434A',
+    password:             'BA+0A6h+EwUVWi6nTFA4bYrM2rceY9YABawqMhW/8GHL',
     authentication:       :login,
   }
 end
