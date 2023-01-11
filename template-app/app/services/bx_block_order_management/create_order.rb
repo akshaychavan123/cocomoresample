@@ -16,7 +16,7 @@ module BxBlockOrderManagement
       elsif check_order_status
         return OpenStruct.new(success?: false, msg: 'Payment not done for this order', code: 400)
       elsif check_valid_items
-       return OpenStruct.new(success?: false, msg: 'No item found in the cart', code: 400)
+        return OpenStruct.new(success?: false, msg: 'No item found in the cart', code: 400)
       elsif product_not_available?
         return OpenStruct.new(success?: false, msg: 'Item not available', code: 400)
       else

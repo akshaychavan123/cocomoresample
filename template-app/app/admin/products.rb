@@ -249,7 +249,7 @@ unless Products::Load.is_loaded_from_gem
           i.input :image, as: :file,:label => "Image", hint: i.object.image.present? ? image_tag(i.object.image, :size => "260x180", class: 'preview') : content_tag(:span, ''), input_html: { class: 'image cropper custom-file-inputproduct', 'cropped-image-temp-store-id': "#croppedImageTempStoreProduct-#{i.index}" }
 
           i.input :cropped_image, :as => :hidden, input_html: {class: 'cropped-product-image-hidden-field', id: "croppedImageTempStoreProduct-#{i.index}"}
-          i.input :is_default
+          i.input :is_default, as: :boolean
         end
         div do
           render partial: 'new'
@@ -432,7 +432,7 @@ unless Products::Load.is_loaded_from_gem
       end
 
       def update
-        reject_blank_images
+        # reject_blank_images
         super do
           if resource.valid?
             flash[:notice] = t('messages.success.updated', resource: 'Product')

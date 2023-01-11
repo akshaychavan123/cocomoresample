@@ -12,6 +12,8 @@ module BxBlockStoreProfile
 
     after_commit :upload_json
     after_commit :update_onboarding_step
+    after_commit :check_api_configuration, if: :saved_change_to_country?
+    after_commit :check_shipping_configuration, if: :saved_change_to_country?
 
     belongs_to :address_state, class_name: "BxBlockOrderManagement::AddressState", optional: true
 
@@ -137,39 +139,61 @@ module BxBlockStoreProfile
           isGoogleLogin: self.is_google_login,
           isAppleLogin: self.is_apple_login,
           razorpay: {api_key: ENV['RAZORPAY_KEY']||@razorpay_configuration&.api_key, secret_key:ENV['RAZORPAY_SECRET']||@razorpay_configuration&.api_secret_key,
-                     account_id: ENV['RAZORPAY_PARTNER_ACCOUNT_ID']},
+          account_id: ENV['RAZORPAY_PARTNER_ACCOUNT_ID'] },
           stripe: {stripe_pub_key: @stripe_configuration&.api_key, stripe_secret_key: @stripe_configuration&.api_secret_key },
           logo: self.logo_url.present? ? self.logo_url[:url] : '' ,
           firebase:{
-            apiKey: self.api_key, authDomain: self.auth_domain, databaseURL: self.database_url, projectId: self.project_id, storageBucket: self.storage_bucket, messagingSenderId: self.messaging_sender_id ,appId: self.app_id, measurementId: self.measurement_id},
-          ShippingKeys: {
-            logistics: {
-              oauth_site_url: @logistics_configuration&.oauth_site_url , base_url: @logistics_configuration&.base_url, client_id: @logistics_configuration&.client_id ,client_secret: @logistics_configuration&.client_id ,logistic_api_key: @logistics_configuration&.client_id
-            },
-            shiprocket: {ship_rocket_base_url: @shiprocket_configuration&.ship_rocket_base_url, ship_rocket_user_email: @shiprocket_configuration&.ship_rocket_user_email, ship_rocket_user_password: @shiprocket_configuration&.ship_rocket_user_password}
+            apiKey: self.api_key, authDomain: self.auth_domain, databaseURL: self.database_url, projectId: self.project_id, storageBucket: self.storage_bucket, messagingSenderId: self.messaging_sender_id ,appId: self.app_id, measurementId: self.measurement_id}
           }
         }
-      }
+      if country_india?
+        response[:ShippingKeys] = {
+          shiprocket: {
+            ship_rocket_base_url: @shiprocket_configuration&.ship_rocket_base_url, ship_rocket_user_email: @shiprocket_configuration&.ship_rocket_user_email, ship_rocket_user_password: @shiprocket_configuration&.ship_rocket_user_password
+          }
+        }
+        response[:PaymentKeys] = {
+          razorpay: {
+            api_key: ENV['RAZORPAY_KEY']||@razorpay_configuration&.api_key,
+            secret_key:ENV['RAZORPAY_SECRET']||@razorpay_configuration&.api_secret_key,
+            account_id: ENV['RAZORPAY_PARTNER_ACCOUNT_ID']
+          }
+        }
+      else
+        response[:ShippingKeys] = {
+          logistics: {
+            oauth_site_url: @logistics_configuration&.oauth_site_url,
+            base_url: @logistics_configuration&.base_url,
+            client_id: @logistics_configuration&.client_id,
+            client_secret: @logistics_configuration&.client_id,
+            logistic_api_key: @logistics_configuration&.client_id
+          }
+        }
+        response[:PaymentKeys] = {
+          stripe: {
+            stripe_pub_key: @stripe_configuration&.api_key,
+            stripe_secret_key: @stripe_configuration&.api_secret_key
+          }
+        }
+      end
+      response
     end
 
     def nested_response_hash
       get_configurations
-
-      if self.whatsapp_number.present?
-        whatsapp_number = if self.country == "india"
-                            "91" + self.whatsapp_number
-                          else
-                            "44" + self.whatsapp_number
-                          end
+      whatsapp_number = if self.country == "india"
+        "91" + self.whatsapp_number rescue ""
+      else
+        "44" + self.whatsapp_number rescue ""
       end
       whatsapp_url = if self.whatsapp_number.present? && self.whatsapp_message.present?
-                       message = self.whatsapp_message.gsub(' ', '%20')
-                       "https://wa.me/#{whatsapp_number}?text=#{message}"
-                     elsif self.whatsapp_number.present?
-                       "https://wa.me/#{whatsapp_number}"
-                     else
-                       ""
-                     end
+        message = self.whatsapp_message.gsub(' ', '%20')
+        "https://wa.me/#{whatsapp_number}?text=#{message}"
+      elsif self.whatsapp_number.present?
+        "https://wa.me/#{whatsapp_number}"
+      else
+        ""
+      end
       response = {
           buttonsColor: {
               regularButtonColor: self.common_button_color,
@@ -198,8 +222,8 @@ module BxBlockStoreProfile
           commonLogoSrc: self.logo_url.present? ? self.logo_url[:url] : '' ,
           productFilterSliderColor: self.sidebar_bg_color,
           PaymentKeys: {
-            razorpay: {api_key: ENV['RAZORPAY_KEY']||@razorpay_configuration&.api_key, secret_key:ENV['RAZORPAY_SECRET']||@razorpay_configuration&.api_secret_key,
-                       account_id: ENV['RAZORPAY_PARTNER_ACCOUNT_ID'] },
+              razorpay: {api_key: ENV['RAZORPAY_KEY']|| @razorpay_configuration&.api_key, secret_key:ENV['RAZORPAY_SECRET']|| @razorpay_configuration&.api_secret_key,
+                account_id: ENV['RAZORPAY_PARTNER_ACCOUNT_ID']},
               stripe: {stripe_pub_key: @stripe_configuration&.api_key, stripe_secret_key: @stripe_configuration&.api_secret_key }
           },
           NotificationKeys: {
@@ -210,12 +234,6 @@ module BxBlockStoreProfile
           productCarousel: ['Top Picks','On Sale','Recommended Products'],
           ExtraFields: {is_facebook_login: self.is_facebook_login, is_google_login: self.is_google_login, is_apple_login: self.is_apple_login ,country: self.country, country_code: self.country == "uk" ? 44 : 91 ,
                         currency_type: self.currency_type, heading: self.heading, sub_heading: self.sub_heading },
-          ShippingKeys: {
-            logistics: {
-              oauth_site_url: @logistics_configuration&.oauth_site_url , base_url: @logistics_configuration&.base_url, client_id: @logistics_configuration&.client_id ,client_secret: @logistics_configuration&.client_id ,logistic_api_key: @logistics_configuration&.client_id
-            },
-            shiprocket: {ship_rocket_base_url: @shiprocket_configuration&.ship_rocket_base_url, ship_rocket_user_email: @shiprocket_configuration&.ship_rocket_user_email, ship_rocket_user_password: @shiprocket_configuration&.ship_rocket_user_password}
-          },
           TemplateSelections: {
             template_selection: self.template_selection,
             color_palet: self.color_palet
@@ -224,6 +242,39 @@ module BxBlockStoreProfile
             whatsapp_url: whatsapp_url
           }
       }
+
+      if BxBlockStoreProfile::BrandSetting.last.country == "india"
+        response[:ShippingKeys] = {
+          shiprocket:
+          {
+            ship_rocket_base_url: @shiprocket_configuration&.ship_rocket_base_url, ship_rocket_user_email: @shiprocket_configuration&.ship_rocket_user_email, ship_rocket_user_password: @shiprocket_configuration&.ship_rocket_user_password
+          }
+        }
+        response[:PaymentKeys] = {
+          razorpay:
+          {
+            api_key: ENV['RAZORPAY_KEY']||@razorpay_configuration&.api_key,
+            secret_key:ENV['RAZORPAY_SECRET']||@razorpay_configuration&.api_secret_key,
+            account_id: ENV['RAZORPAY_PARTNER_ACCOUNT_ID']
+          }
+        }
+      else
+        response[:ShippingKeys] = {
+          logistics: {
+            oauth_site_url: @logistics_configuration&.oauth_site_url,
+            base_url: @logistics_configuration&.base_url,
+            client_id: @logistics_configuration&.client_id,
+            client_secret: @logistics_configuration&.client_id,
+            logistic_api_key: @logistics_configuration&.client_id
+          }
+        }
+        response[:PaymentKeys] = {
+          stripe: {
+            stripe_pub_key: @stripe_configuration&.api_key,
+            stripe_secret_key: @stripe_configuration&.api_secret_key
+          }
+        }
+      end
       return response
     end
 
@@ -237,6 +288,27 @@ module BxBlockStoreProfile
     def country_india?
       self.country == 'india' ? true : false
     end
+
+    def country_uk?
+      self.country == 'uk' ? true : false
+    end
+
+    def check_api_configuration
+      if self.country_india? && !BxBlockApiConfiguration::ApiConfiguration.find_by(configuration_type: "razorpay").present?
+        BxBlockApiConfiguration::ApiConfiguration.create(configuration_type: "razorpay", api_key: "n/a", api_secret_key: "n/a")
+      elsif self.country_uk? && !BxBlockApiConfiguration::ApiConfiguration.find_by(configuration_type: "stripe").present?
+        BxBlockApiConfiguration::ApiConfiguration.create(configuration_type: "stripe", api_key: "n/a", api_secret_key: "n/a")
+      end
+    end
+
+    def check_shipping_configuration
+      if self.country_india?  && !BxBlockApiConfiguration::ApiConfiguration.find_by(configuration_type: "shiprocket").present?
+        BxBlockApiConfiguration::ApiConfiguration.create(configuration_type: "shiprocket", ship_rocket_user_email: "n/a", ship_rocket_user_password: "n/a")
+      elsif  self.country_uk?  && !BxBlockApiConfiguration::ApiConfiguration.find_by(configuration_type: "525k").present?
+        BxBlockApiConfiguration::ApiConfiguration.create(configuration_type: "525k", oauth_site_url: "n/a", base_url: "n/a", client_id: "n/a", client_secret: "n/a", logistic_api_key: "n/a")
+      end
+    end
+
 
     private
 

@@ -30,7 +30,6 @@ unless CustomerFeedbacks::Load.is_loaded_from_gem
       column :position
       column :customer_name
       column :is_active
-      # f.input :catalogue_id, as: :select, collection: BxBlockCatalogue::Catalogue.active.map { |p| [p.name, p.id] }, :prompt => "Product", input_html: { class: 'select2' }
       column 'Image' do |customer_feedback|
         image_tag(url_for(customer_feedback.image), width: "50px", height: "50px") if customer_feedback.image.present?
       end
@@ -46,7 +45,7 @@ unless CustomerFeedbacks::Load.is_loaded_from_gem
         f.input :position
         f.input :customer_name
         f.input :is_active
-        # f.input :catalogue_id, as: :select, collection: BxBlockCatalogue::Catalogue.all.map { |p| [p.name, p.id] }, :prompt => "Product", input_html: { class: 'select2' }
+        # f.input :catalogue_id, as: :select, collection: BxBlockCatalogue::Catalogue.active.map { |p| [p.name, p.id] }, :prompt => "Product", input_html: { class: 'select2' }
         f.input :image, :as => :file, :hint => f.object.image.present? ? image_tag(url_for(f.object.image)) : content_tag(:span, "please add image")
       end
       f.actions do

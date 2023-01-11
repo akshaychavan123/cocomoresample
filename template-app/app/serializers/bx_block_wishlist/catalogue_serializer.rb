@@ -28,7 +28,7 @@
 #
 module BxBlockWishlist
   class CatalogueSerializer < BuilderBase::BaseSerializer
-    attributes :brand, :tags, :reviews,
+    attributes :brand, :tags,
                :name, :sku, :description, :manufacture_date,
                :length, :breadth, :height, :stock_qty,
                :availability, :weight, :price, :price_including_tax, :recommended,
@@ -104,6 +104,11 @@ module BxBlockWishlist
         cart_quantity =  nil
       end
       cart_quantity
+    end
+
+
+    attribute :reviews do |object|
+      object.reviews.where(is_published: true)
     end
   end
 end

@@ -22,6 +22,7 @@ minio:
   region:  <%= ENV['STORAGE_REGION'] %>
   bucket:  <%= ENV['STORAGE_BUCKET'] %>
   force_path_style: true
+  public: true
   upload:
     acl: "public-read"
 

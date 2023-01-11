@@ -256,7 +256,7 @@ module BxBlockCatalogue
       if params[:ignore_is_subscription_available]
         nil
       else
-        object.catalogue_subscriptions.present? ? true : false
+        object.catalogue_subscriptions.present?
       end
     end
 
@@ -311,4 +311,3 @@ module BxBlockCatalogue
     end
   end
 end
-

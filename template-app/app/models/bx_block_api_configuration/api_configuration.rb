@@ -5,6 +5,7 @@ module BxBlockApiConfiguration
     enum configuration_type: ['stripe', 'razorpay', 'shiprocket', '525k']
 
     validates :api_key, :api_secret_key, presence: true, if: -> {configuration_type == 'razorpay'}
+    validates :api_key, :api_secret_key, presence: true, if: -> {configuration_type == 'stripe'}
     validates :ship_rocket_user_email, :ship_rocket_user_password, presence: true, if: -> {configuration_type == 'shiprocket'}
     validates :application_id, :application_token, presence: true, if: -> {configuration_type == 'bulkgate_sms'}
     validates :oauth_site_url, :base_url, :client_id, :client_secret, :logistic_api_key, presence: true, if: -> {configuration_type == '525k'}

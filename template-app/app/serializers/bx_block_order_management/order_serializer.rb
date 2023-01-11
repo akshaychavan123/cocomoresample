@@ -62,6 +62,10 @@ module BxBlockOrderManagement
       :sub_total
     ]
 
+    attribute :items_total do |object|
+      object.items_total
+    end
+
     attribute :total do |object|
       object.total.round(2)
     end

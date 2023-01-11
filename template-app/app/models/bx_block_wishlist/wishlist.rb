@@ -7,5 +7,9 @@ module BxBlockWishlist
     belongs_to :account, class_name: "AccountBlock::Account"
 
     validates_uniqueness_of :account_id
+
+    def item_count
+      self.wishlist_items.active_catalogues.count
+    end
   end
 end

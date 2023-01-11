@@ -1,6 +1,6 @@
 # **Ruby** | _**CocoMore**_ | _**300779** | _**studio_store**_
 
-## **Catalog ProjectId: 155753** | **Catalog BuildId: 18987**
+## **Catalog ProjectId: 155753** | **Catalog BuildId: 19783**
 
 ## NOTE FOR DEVELOPERS:
 Clone the code-engine branch into your working branch. The contents of the branch may get overwritten.
@@ -50,11 +50,11 @@ Code-Engine
 | SplashScreen2      | bx_block_splashscreen2      | {-app/controllers/bx_block_splashscreen2-} | {-Empty-} |
 | EmailLists      | bx_block_emaillists      | {-app/controllers/bx_block_emaillists-} | {-Empty-} |
 | TargetedFeed      | bx_block_targetedfeed      | {-app/controllers/bx_block_targetedfeed-} | {-Empty-} |
-| LiveChat2      | bx_block_livechat2      | {-app/controllers/bx_block_livechat2-} | {-Empty-} |
+| LiveChat      | bx_block_livechat      | {-app/controllers/bx_block_livechat-} | {-Empty-} |
 | DiscountsOffers      | bx_block_discountsoffers      | {-app/controllers/bx_block_discountsoffers-} | {-Empty-} |
 | AdHocReporting      | bx_block_adhocreporting      | {-app/controllers/bx_block_adhocreporting-} | {-Empty-} |
 
 ## GRAFANA BACKEND URL
- - https://grafana.cocomore-300779-ruby.b300779.dev.eastus.az.svc.builder.cafe
+ - https://grafana.<\<error-empty-cat-url>>
 
 This application is a Ruby API. Full README coming soon...

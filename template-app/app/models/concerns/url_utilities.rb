@@ -2,7 +2,10 @@ module UrlUtilities
   extend ActiveSupport::Concern
 
   def url_for(file)
-    base_url + Rails.application.routes.url_helpers.rails_blob_path(file, only_path: true)
+    if file.class.name.include?('ActiveStorage') && file.respond_to?(:key)
+      url = ENV['MINIO_CDN_ENDPOINT'].present? ? ENV['MINIO_CDN_ENDPOINT'] : Rails.configuration.x.cdn_host
+      "#{url}/#{file.key}"
+    end
   end
 
   def base_url

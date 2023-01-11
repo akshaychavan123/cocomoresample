@@ -2,7 +2,7 @@
 # require 'response/success'
 module BxBlockOrderManagement
   class AddProduct
-      attr_accessor :params, :quantity, :catalogue, :order, :user, :catalogue_variant
+    attr_accessor :params, :quantity, :catalogue, :order, :user, :catalogue_variant
 
     def initialize(params, user)
       @params = Rails.env.test? ? params['params'] : params

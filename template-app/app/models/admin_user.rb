@@ -51,7 +51,6 @@ class AdminUser < ApplicationRecord
     end
 
     def change_email_keywords(content, customer: nil, product: nil, variant: nil)
-
         default_email_setting = BxBlockSettings::DefaultEmailSetting.first
         contact_us =  BxBlockContactUs::Contact.where(account_id: customer&.id).last
         BxBlockSettings::EmailSetting::EMAIL_KEYWORDS.each do |key|

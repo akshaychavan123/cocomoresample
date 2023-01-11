@@ -1,0 +1,6 @@
+<% if api.configuration_type == "razorpay" %>
+  <span><%= api.configuration_type.capitalize %> </span>
+  &nbsp;&nbsp;<span onclick="window.open('https://intercom.help/engineerai/en/articles/6258382-razorpay-help-guide','_blank')" style="cursor:pointer;color:#4bacfe;font-size:14px;font-style:italic">(info)</span>
+<% else %>
+  <span><%= api.configuration_type.capitalize %> </span>
+<% end %>

@@ -52,29 +52,10 @@ module BxBlockCart
         ).find(@res.data.id)
         order.reload
         order.update_column('total_tax', order.order_items.map(&:tax_charge).compact.sum.round(2))
-        order_cat_ids = order.order_items.pluck(:id, :catalogue_id)
-        json_data = {
-          data: {
-            id: order.id,
-              attributes: {
-                id: order.id
-            }
-          }
-        }
-        arr = []
-        order_cat_ids.each do |ids|
-          arr.push({
-            id: ids[0],
-            type: "order_item",
-            attributes: {
-              id: ids[0],
-              catalogue_id: ids[1]
-            }
-          })
-        end
-        json_data[:data][:attributes][:order_items] = arr
-
-        render json: json_data, status: 200
+        render json: CartSerializer.new(
+          order,
+          { params: { user: @current_user, host: request.protocol + request.host_with_port } }
+        ), status: 200
       else
         render json: { errors: [{ order: @res.msg }] }, status: :unprocessable_entity
       end
@@ -236,7 +217,8 @@ module BxBlockCart
         render json: {
             data: {
               has_cart_product: order_items.present?, order_id: order.id,
-              total_cart_item: BxBlockOrderManagement::Order.total_cart_item(@current_user)
+              total_cart_item: BxBlockOrderManagement::Order.total_cart_item(@current_user),
+              total_wishlist_items: @current_user.wishlist&.item_count || 0
             },
             success: true, message: ''
         }, status: 200

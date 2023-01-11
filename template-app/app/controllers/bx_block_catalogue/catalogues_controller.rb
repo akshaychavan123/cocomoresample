@@ -131,13 +131,56 @@ module BxBlockCatalogue
     end
 
     def recommended_products
-      recommended_products =  Catalogue.active.where("recommended": true)
-      if recommended_products.any?
-        render json: CatalogueSerializer.new(recommended_products, serialization_options),
-               status: :ok
-      else
-        render(json: { message: "No recommendations" }, status: 200)
+      recommended_products = Catalogue.active.latest.recommended.page(params[:page] || 1).per(params[:per_page] || 10)
+      render json: RecommendedCatalogueListingSerializer.new(recommended_products, { params: { host: request.protocol + request.host_with_port, user: @current_user }, meta: { pagination: { current_page: recommended_products.current_page, next_page: recommended_products.next_page, prev_page: recommended_products.prev_page, total_pages: recommended_products.total_pages, total_count: recommended_products.length } } }), status: :ok
+    end
+
+    def products
+      products = Catalogue.active.latest.page(params[:page] || 1).per(params[:per_page] || 10)
+      render json: CatalogueListingSerializer.new(products, { params: { host: request.protocol + request.host_with_port, user: @current_user }, meta: { pagination: { current_page: products.current_page, next_page: products.next_page, prev_page: products.prev_page, total_pages: products.total_pages, total_count: products.length } } }), status: :ok
+    end
+
+    def products_and_variants
+      catalogues = Catalogue.active.latest.page(params[:page] || 1).per(params[:per_page] || 10)
+
+      available_variants = {}
+
+      property_ids = catalogues.joins(catalogue_variants: :catalogue_variant_properties).pluck("catalogue_variant_properties.id")
+
+      BxBlockCatalogue::CatalogueVariantProperty.joins(:catalogue_variant).where(id: property_ids).where("catalogue_variants.stock_qty > ?", 0).group_by(&:variant_id).each do |key, variants|
+        variant_name = BxBlockCatalogue::Variant.find_by(id: key).name
+        variants.each do |property|
+          variant_property_name = BxBlockCatalogue::VariantProperty.find_by(id: property.variant_property_id).name rescue nil
+          if !available_variants.has_key?(variant_name)
+            available_variants[variant_name] = [{ variant_property_name: variant_property_name, variant_property_id: property.variant_property_id }]
+          elsif !available_variants[variant_name].include?({ variant_property_name: variant_property_name, variant_property_id: property.variant_property_id }).present?
+            available_variants[variant_name] += [{ variant_property_name: variant_property_name, variant_property_id: property.variant_property_id }]
+          end
+        end
       end
+
+      render json: { data: { catalogues: CatalogueListingSerializer.new(catalogues, { params: { host: request.protocol + request.host_with_port, user: @current_user } }), available_variants: available_variants }, meta: { pagination: { current_page: catalogues.current_page, next_page: catalogues.next_page, prev_page: catalogues.prev_page, total_pages: catalogues.total_pages, total_count: catalogues.length } }
+      }, status: :ok
+    end
+
+    def product_variants
+      available_variants = {}
+
+      property_ids = Catalogue.active.joins(catalogue_variants: :catalogue_variant_properties).pluck("catalogue_variant_properties.id")
+
+      BxBlockCatalogue::CatalogueVariantProperty.joins(:catalogue_variant).where(id: property_ids).where("catalogue_variants.stock_qty > ?", 0).group_by(&:variant_id).each do |key, variants|
+        variant_name = BxBlockCatalogue::Variant.find_by(id: key).name
+        variants.each do |property|
+          variant_property_name = BxBlockCatalogue::VariantProperty.find_by(id: property.variant_property_id).name rescue nil
+          if !available_variants.has_key?(variant_name)
+            available_variants[variant_name] = [{ variant_property_name: variant_property_name, variant_property_id: property.variant_property_id }]
+          elsif !available_variants[variant_name].include?({ variant_property_name: variant_property_name, variant_property_id: property.variant_property_id }).present?
+            available_variants[variant_name] += [{ variant_property_name: variant_property_name, variant_property_id: property.variant_property_id }]
+          end
+        end
+      end
+
+      render json: available_variants, status: :ok
     end
 
     def reindex
@@ -278,7 +321,6 @@ module BxBlockCatalogue
 
     def serialization_options(template = nil)
       request_hash = { params: { host: request.protocol + request.host_with_port, user: @current_user, cart: @cart,can_review: @can_review, catalogue_id: @catalogue&.id } }
-
       brand_setting = BxBlockStoreProfile::BrandSetting.first
 
       if params[:action] == 'index'

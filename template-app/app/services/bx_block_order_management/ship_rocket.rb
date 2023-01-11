@@ -4,12 +4,13 @@ require "net/http"
 module BxBlockOrderManagement
   class ShipRocket
     attr_accessor :token
-    shiprocket_configuration = BxBlockApiConfiguration::ApiConfiguration.find_by(configuration_type: 'shiprocket')
     SHIP_ROCKET_BASE_URL = "https://apiv2.shiprocket.in/v1/"
-    SHIP_ROCKET_USER_EMAIL = shiprocket_configuration&.ship_rocket_user_email
-    SHIP_ROCKET_USER_PASSWORD = shiprocket_configuration&.ship_rocket_user_password
 
     def authorize
+      shiprocket_configuration = BxBlockApiConfiguration::ApiConfiguration.find_by(configuration_type: 'shiprocket')
+      shiprock_user_email = shiprocket_configuration&.ship_rocket_user_email.to_s.strip
+      shiprocket_user_password = shiprocket_configuration&.ship_rocket_user_password.to_s.strip
+
       begin
         url = URI("#{SHIP_ROCKET_BASE_URL}"+"external/auth/login")
 
@@ -20,8 +21,8 @@ module BxBlockOrderManagement
         request["Content-Type"] = "application/json"
 
         request.body = {
-            "email"=> SHIP_ROCKET_USER_EMAIL,
-            "password"=> SHIP_ROCKET_USER_PASSWORD
+          "email"=> shiprock_user_email,
+          "password"=> shiprocket_user_password
         }.to_json
 
         response = https.request(request)
@@ -36,7 +37,8 @@ module BxBlockOrderManagement
         request["Authorization"] = "Bearer #{@token}"
         pickup_location_response = https.request(request)
         @pickup_location = JSON.parse(pickup_location_response.body)['data']['shipping_address'][0]['pickup_location']
-      rescue
+        @pickup_location
+      rescue Exception => e
         @token = nil
       end
     end
@@ -62,7 +64,7 @@ module BxBlockOrderManagement
       request["Content-Type"] = "application/json"
       request["Authorization"] = "Bearer #{@token}"
       request.body = {
-          "ids"=> [@order.ship_rocket_order_id]
+        "ids"=> [@order.ship_rocket_order_id]
       }.to_json
       response = https.request(request)
     end
@@ -85,7 +87,7 @@ module BxBlockOrderManagement
     def order_items(order)
       items = []
       order.order_items.each do |item|
-        items << {"name"=> item.catalogue&.name, "sku"=>"#{item.order.id}-#{item.id}-#{item.catalogue.sku}", "units"=> item.quantity.present? ? item.quantity : item.subscription_quantity, "selling_price"=> item.unit_price}
+        items << {"name"=> item.catalogue&.name, "sku"=>"#{item.order.order_number}-#{item.id}-#{item.catalogue.sku}", "units"=> item.quantity.present? ? item.quantity : item.subscription_quantity, "selling_price"=> item.unit_price}
       end
       items
     end
@@ -97,7 +99,7 @@ module BxBlockOrderManagement
       @delivery_address = delivery_addresses.where(address_for: 'billing_and_shipping').last&.delivery_address if @delivery_address.blank?
       @shipping_address = delivery_addresses.where(address_for: 'billing').present? ? delivery_addresses.where(address_for: 'billing').last&.delivery_address : delivery_addresses.where(address_for: 'billing_and_shipping').last&.delivery_address
 
-      {"order_id"=>@order.id.to_s,
+      {"order_id"=>@order.order_number,
        "order_date"=>@order.created_at.strftime('%Y-%m-%d %I:%M'),
        "pickup_location"=>@pickup_location,
        "channel_id"=>"Custom",
@@ -123,10 +125,8 @@ module BxBlockOrderManagement
        "shipping_email"=>@order.account.email,
        "shipping_phone"=>@shipping_address&.phone_number,
        "order_items"=> order_items(@order),
-       "payment_method"=>@order.source,
-       "shipping_charges"=>@order.shipping_total,
-       "total_discount"=>@order.applied_discount,
-       "sub_total"=>@order.sub_total,
+       "payment_method"=>(@order.source.to_s.downcase.eql?('cod') ? 'COD' : 'Prepaid'),
+       "sub_total"=>@order.total,
        "length"=>@order.length,
        "breadth"=>@order.breadth,
        "height"=>@order.height,

@@ -9,5 +9,6 @@ module BxBlockWishlist
 
     # Scopes
     scope :by_catalogue_id, ->(id) { where(catalogue_id: id) }
+    scope :active_catalogues, -> { left_outer_joins(:catalogue).where(catalogues: {status: "active"}).distinct }
   end
 end

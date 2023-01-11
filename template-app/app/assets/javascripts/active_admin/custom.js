@@ -751,11 +751,11 @@ $(document).ready(function () {
     const rows = $("#index_table_partner_configurations tbody tr td.col-partner")
     let rowElementName = null;
     rows.each(function(index) {
-      if('Razorpay' === $(this).text()){
+      if($(this).text().includes('Razorpay')){
         rowElementName = $(this).parent().attr("id")
       }
     });
-    $(`#${rowElementName} td.col-password div`).addClass("pass")
+    //$(`#${rowElementName} td.col-password div`).addClass("pass")
     // $(`#${rowElementName} td.col-password div`).append(`&nbsp;&nbsp;<span onclick="window.open('https://intercom.help/engineerai/en/articles/6258382-razorpay-help-guide','_blank')" style="cursor:pointer;color:#4bacfe;font-size:14px;font-style:italic">(info)</span>`)
     if(rowElementName && $("#3rdpartyapikey").data("api")){
 

@@ -200,7 +200,7 @@ module BxBlockOrderManagement
     end
 
     def check_order_in_cart
-      @order = @current_user.orders.in_cart.find(params[:cart_id])
+      @order = @current_user.orders.where(status: ['in_cart', 'created']).find(params[:cart_id])
     end
 
     def serializable_options

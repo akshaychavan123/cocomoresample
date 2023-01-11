@@ -33,15 +33,11 @@ BxBlockOrderManagement::Tax.find_or_create_by(tax_percentage: 15)
 BxBlockOrderManagement::Tax.find_or_create_by(tax_percentage: 18)
 
 # States with their gst codes
-STATES_WITH_GST_CODES = [[1, 'JAMMU AND KASHMIR'],[2, 'HIMACHAL PRADESH'],[3, 'PUNJAB'],[4, 'CHANDIGARH'],[5, 'UTTARAKHAND'],[6, 'HARYANA'],[7, 'DELHI'],[8, 'RAJASTHAN'],[9, 'UTTAR PRADESH'],[10, 'BIHAR'],[11, 'SIKKIM'],[12, 'ARUNACHAL PRADESH'],[13, 'NAGALAND'],[14, 'MANIPUR'],[15, 'MIZORAM'],[16, 'TRIPURA'],[17, 'MEGHALAYA'],[18, 'ASSAM'],[19, 'WEST BENGAL'],[20, 'JHARKHAND'],[21, 'ODISHA'],[22, 'CHATTISGARH'],[23, 'MADHYA PRADESH'],[24, 'GUJARAT'],[26, 'DADRA AND NAGAR HAVELI AND DAMAN AND DIU'],[27, 'MAHARASHTRA'],[28, 'ANDHRA PRADESH'],[29, 'KARNATAKA'],[30, 'GOA'],[31, 'LAKSHADWEEP'],[32, 'KERALA'],[33, 'TAMIL NADU'],[34, 'PUDUCHERRY'],[35, 'ANDAMAN AND NICOBAR ISLANDS'],[36, 'TELANGANA'],[37, 'ANDHRA PRADESH'],[38, 'LADAKH']]
+STATES_WITH_GST_CODES = [[1, 'JAMMU AND KASHMIR'],[2, 'HIMACHAL PRADESH'],[3, 'PUNJAB'],[4, 'CHANDIGARH'],[5, 'UTTARAKHAND'],[6, 'HARYANA'],[7, 'DELHI'],[8, 'RAJASTHAN'],[9, 'UTTAR PRADESH'],[10, 'BIHAR'],[11, 'SIKKIM'],[12, 'ARUNACHAL PRADESH'],[13, 'NAGALAND'],[14, 'MANIPUR'],[15, 'MIZORAM'],[16, 'TRIPURA'],[17, 'MEGHALAYA'],[18, 'ASSAM'],[19, 'WEST BENGAL'],[20, 'JHARKHAND'],[21, 'ODISHA'],[22, 'CHATTISGARH'],[23, 'MADHYA PRADESH'],[24, 'GUJARAT'],[26, 'DADRA AND NAGAR HAVELI AND DAMAN AND DIU'],[27, 'MAHARASHTRA'],[29, 'KARNATAKA'],[30, 'GOA'],[31, 'LAKSHADWEEP'],[32, 'KERALA'],[33, 'TAMIL NADU'],[34, 'PUDUCHERRY'],[35, 'ANDAMAN AND NICOBAR ISLANDS'],[36, 'TELANGANA'],[37, 'ANDHRA PRADESH'],[38, 'LADAKH']]
 STATES_WITH_GST_CODES.each do |state|
   BxBlockOrderManagement::AddressState.find_or_create_by(gst_code: state[0], name: state[1])
 end
 delhi = BxBlockOrderManagement::AddressState.find_by(name: 'DELHI')
-
-# Third party API configurations
-BxBlockApiConfiguration::ApiConfiguration.find_or_create_by(configuration_type: "razorpay", api_key: "n/a", api_secret_key: "n/a")
-BxBlockApiConfiguration::ApiConfiguration.find_or_create_by(configuration_type: "shiprocket", ship_rocket_user_email: "n/a", ship_rocket_user_password: "na")
 
 # Dummy data
 unless BxBlockStoreProfile::BrandSetting.any?
@@ -122,6 +118,15 @@ unless BxBlockStoreProfile::BrandSetting.any?
         end
       end
     end
+  end
+
+  # Third party API configurations
+  if brand_setting.country == 'india'
+    BxBlockApiConfiguration::ApiConfiguration.find_or_create_by(configuration_type: "razorpay", api_key: "n/a", api_secret_key: "n/a")
+    BxBlockApiConfiguration::ApiConfiguration.find_or_create_by(configuration_type: "shiprocket", ship_rocket_user_email: "n/a", ship_rocket_user_password: "na")
+  else
+    BxBlockApiConfiguration::ApiConfiguration.find_or_create_by(configuration_type: "stripe", api_key: "n/a", api_secret_key: "n/a")
+    BxBlockApiConfiguration::ApiConfiguration.find_or_create_by(configuration_type: "525k", oauth_site_url: "n/a", base_url: "n/a", client_id: "n/a", client_secret: "n/a", logistic_api_key: "n/a")
   end
 end
 

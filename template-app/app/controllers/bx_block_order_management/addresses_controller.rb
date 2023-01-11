@@ -35,8 +35,12 @@ module BxBlockOrderManagement
     end
 
     def destroy
-      @delivery_address.destroy
-      render json: { message: 'Address deleted successfully' }, status: :ok
+      if @delivery_address.orders.present?
+        render(json: { message: "You can't delete this address because it's associated with some order(s)" }, status: 400)
+      else
+        @delivery_address.destroy
+        render json: { message: 'Address deleted successfully' }, status: :ok
+      end
     end
 
     def update
