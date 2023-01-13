@@ -32,7 +32,7 @@ module BxBlockOrderManagement
           end
           coupon = order.coupon_code
           if order.order_items.present? && coupon.present?
-            BxBlockOrderManagement::ApplyCoupon.new(order, coupon, {cart_value: order.order_items.map(&:total_price).sum}).call
+            BxBlockOrderManagement::ApplyCoupon.new(order, coupon, {cart_value: recalculate_cart_value(order)}).call
           end
         end
       end
@@ -41,7 +41,7 @@ module BxBlockOrderManagement
     private
 
     def order_attributes
-      { code: order.coupon_code.code, cart_id: order.id, cart_value: order.sub_total, existing_cart: true }
+      { code: order.coupon_code.code, cart_id: order.id, cart_value: recalculate_cart_value(order), existing_cart: true }
     end
 
     def update_order_total
@@ -54,6 +54,19 @@ module BxBlockOrderManagement
 
     def update_order_sub_total
       order.sub_total = order.sub_total_price
+    end
+
+    def recalculate_cart_value(order)
+      total = 0.0
+      order.order_items.each do |order_item|
+        if order_item.catalogue_variant_id.present?
+          price = order_item.catalogue_variant.on_sale? ? order_item.catalogue_variant.sale_price : order_item.catalogue_variant.price
+        else
+          price = order_item.catalogue.on_sale? ? order_item.catalogue.sale_price : order_item.catalogue.price
+        end
+        total = total + (price.to_f * order_item.quantity.to_i)
+      end
+      total
     end
   end
 end

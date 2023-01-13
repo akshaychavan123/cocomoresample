@@ -38,6 +38,10 @@ module BxBlockOrderManagement
           order_item.update_columns(unit_price: total_amount, total_price: (total_amount * order_item.order_item_qty), basic_amount: basic_amount.to_f.round(2), tax_amount: gst_amount.to_f.round(2))
         end
         order.update_column('total_tax', order.order_items.map(&:tax_charge).compact.sum.round(2))
+        delivery_address = order.delivery_addresses.where(address_for: ['billing_and_shipping', 'shipping']).first
+        if delivery_address.present?
+          BxBlockShippingCharge::UpdateShippingChargeValue.new({cart_id: order.id, zipcode: delivery_address.zip_code}).call
+        end
         return OpenStruct.new(success?: true, order: order,  msg: 'Coupon applied successfully', code: 200)
       end
     end

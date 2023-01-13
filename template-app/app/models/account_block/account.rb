@@ -53,6 +53,8 @@ module AccountBlock
     after_create :track_event, :delete_guest_user
     before_destroy :remove_wishlists
 
+    scope :guest, -> { where(guest: true) }
+
     REGEX_PATTERN = /\A[^@\s]+@([^@\s]+\.)+[^@\s]+\z/
 
     # def self.new_guest

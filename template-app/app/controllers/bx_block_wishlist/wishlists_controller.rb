@@ -13,7 +13,11 @@ module BxBlockWishlist
           message: "The item has been added to the wishlist",
           data:
           {
-            wishlist: WishlistSerializer.new(@current_user.wishlist, { params: { user: @current_user} })
+            wishlist: WishlistSerializer.new(@current_user.wishlist, {
+              params: {
+                user: @current_user, page: params[:page], per_page: params[:per_page]
+              }
+            }),
           }
         }, status: 200
       else
@@ -76,7 +80,7 @@ module BxBlockWishlist
 
     def fetch_wishlist_item
       fetch_wishlist
-      @wishlist_item = @wishlist.wishlist_items.find_by(catalogue_id: params[:catalogue_id], catalogue_variant_id: params[:catalogue_variant_id])
+      @wishlist_item = @wishlist.wishlist_items.where("catalogue_id = ? OR catalogue_variant_id = ? ", params[:catalogue_id], params[:catalogue_variant_id]).first
       params[:id] = params[:catalogue_id] if @wishlist_item.nil?
       @wishlist_item ||= WishlistItem.find_by(id: params[:id])
     end

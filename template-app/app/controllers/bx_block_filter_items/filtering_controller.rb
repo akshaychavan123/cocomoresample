@@ -1,47 +1,58 @@
 module BxBlockFilterItems
   class FilteringController < ApplicationController
     def index
-      if params[:q].nil?
-        @catalogues = BxBlockCatalogue::Catalogue.active
-      else
-        @catalogues = CatalogueFilter.new(::BxBlockCatalogue::Catalogue, params[:q]).call
-        save_recent_search
-      end
-
+      execute_queries
       # To keep order by consistent for frontend
-      if params[:sort] && params[:sort][:order_by] == "recommended"
-        params[:sort][:order_field] = "recommended"
-        params[:sort].delete :order_by
-      end
+      set_recommended_order
 
       render(json: { message: "No product found" }, status: 200) && return if @catalogues.empty?
 
-      @catalogues = BxBlockSorting::SortRecords.new(
-        @catalogues, params[:sort]
-      ).call if params[:sort].present?
+      @catalogues = BxBlockSorting::SortRecords.new(@catalogues, params[:sort]).call if params[:sort].present?
 
-      if params[:sort].present? && params[:sort][:order_field] == "recommended"
-        @catalogues = @catalogues.recommended
-      end
+      @catalogues = @catalogues.recommended if params[:sort].present? && params[:sort][:order_field] == "recommended"
 
-      if params[:discounted_items].present?
-        @catalogues = @catalogues.discounted_items
-      end
+      @catalogues = @catalogues.discounted_items if params[:discounted_items].present?
 
-      catalogue_count = @catalogues.count
-      page_no = params[:page].to_i == 0 ? 1 : params[:page].to_i
-      per_page = params[:per_page].to_i == 0 ? 10 : params[:per_page].to_i
-
-      @catalogues = @catalogues.page(page_no).per(per_page)
+      paginate_records
 
       data = BxBlockCatalogue::CatalogueSerializer.new(@catalogues, serialization_options(params[:template])).serializable_hash
-      data[:meta] = { pagination: {
-        current_page: @catalogues.current_page,
-        next_page: @catalogues.next_page,
-        prev_page: @catalogues.prev_page,
-        total_pages: @catalogues.total_pages,
-        total_count: catalogue_count
+      data[:meta] = {
+        pagination: {
+          current_page: @catalogues.current_page,
+          next_page: @catalogues.next_page,
+          prev_page: @catalogues.prev_page,
+          total_pages: @catalogues.total_pages,
+          total_count: @catalogues.count
+        }
       }
+
+      render json: data, status: :ok
+    end
+
+    def product_filter
+      execute_queries
+      # To keep order by consistent for frontend
+      set_recommended_order
+
+      render(json: { message: "No product found" }, status: 200) && return if @catalogues.empty?
+
+      @catalogues = BxBlockSorting::SortRecords.new(@catalogues, params[:sort]).call if params[:sort].present?
+
+      @catalogues = @catalogues.recommended if params[:sort].present? && params[:sort][:order_field] == "recommended"
+
+      @catalogues = @catalogues.discounted_items if params[:discounted_items].present?
+
+      paginate_records
+
+      data = BxBlockCatalogue::FilterCatalogueSerializer.new(@catalogues, { params: { user: @current_user }}).serializable_hash
+      data[:meta] = {
+        pagination: {
+          current_page: @catalogues.current_page,
+          next_page: @catalogues.next_page,
+          prev_page: @catalogues.prev_page,
+          total_pages: @catalogues.total_pages,
+          total_count: @catalogues.count
+        }
       }
 
       render json: data, status: :ok
@@ -74,6 +85,15 @@ module BxBlockFilterItems
       request_hash
     end
 
+    def execute_queries
+      if params[:q].nil?
+        @catalogues = BxBlockCatalogue::Catalogue.active
+      else
+        @catalogues = CatalogueFilter.new(::BxBlockCatalogue::Catalogue, params[:q]).call
+        save_recent_search
+      end
+    end
+
     def save_recent_search
       return unless params[:q][:name]
 
@@ -97,6 +117,19 @@ module BxBlockFilterItems
         search_type: type
       )
       # end
+    end
+
+    def set_recommended_order
+      if params[:sort] && params[:sort][:order_by] == "recommended"
+        params[:sort][:order_field] = "recommended"
+        params[:sort].delete :order_by
+      end
+    end
+
+    def paginate_records
+      page_no = params[:page].to_i == 0 ? 1 : params[:page].to_i
+      per_page = params[:per_page].to_i == 0 ? 10 : params[:per_page].to_i
+      @catalogues = @catalogues.page(page_no).per(per_page)
     end
   end
 end

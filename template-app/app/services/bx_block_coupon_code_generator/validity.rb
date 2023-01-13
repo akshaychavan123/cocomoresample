@@ -27,7 +27,7 @@ module BxBlockCouponCodeGenerator
       discount_price = (cart_value - discount)&.round(2)
       shipping_charges = order.shipping_total.to_f
       tax_charges = order.total_tax.to_f
-      order.update!(coupon_code_id: coupon_code.id, total: (discount_price + shipping_charges + tax_charges), applied_discount: discount)
+      order.update!(coupon_code_id: coupon_code.id, total: (discount_price + shipping_charges), applied_discount: discount)
       return OpenStruct.new(success?: true, data: { coupon: coupon_code, actual_price: cart_value, discount_type: coupon_code.discount_type, cart_discount: coupon_code.discount, discount_price: discount, after_discount_price: discount_price }, msg: 'Coupon applied successfully', code: 200)
     end
 
@@ -63,6 +63,5 @@ module BxBlockCouponCodeGenerator
       tax_charges = order.total_tax.to_f
       order.update!(total: (cart_value + shipping_charges + tax_charges), sub_total: order.total_price)
     end
-
   end
 end

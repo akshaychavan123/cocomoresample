@@ -195,6 +195,20 @@ module BxBlockOrderManagement
       end
     end
 
+    def items_total
+      price = 0
+      total = 0
+      self.order_items.each do |order_item|
+        if order_item&.catalogue_variant_id.present?
+          price = order_item.catalogue_variant&.on_sale? ? order_item.catalogue_variant&.sale_price : order_item.catalogue_variant&.price
+        else
+          price = order_item.catalogue&.on_sale? ? order_item.catalogue&.sale_price : order_item.catalogue&.price
+        end
+        total = total + (price.to_f * order_item.quantity.to_i)
+      end
+      total
+    end
+
     def total_after_shipping_charge
       address = self.delivery_addresses.delivery_add.first
       zipcode = BxBlockZipcode::Zipcode.find_by_code(address&.zip_code)

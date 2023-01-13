@@ -1,6 +1,6 @@
 module BxBlockSearch
   class SearchSerializer < BuilderBase::BaseSerializer
-    attributes :name, :id, :type
+    attributes :name, :id, :type, :count
 
     attribute :category_id, if: Proc.new { |object|
       object.category_id if object.type == "catalogue"

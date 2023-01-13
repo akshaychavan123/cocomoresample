@@ -58,6 +58,9 @@ module BxBlockCatalogue
     before_save :calculate_tax_amount, :set_current_availablity
     after_save :set_default_variant, :set_product_price, :send_notification, :inventory_low_stock_mailings
 
+    scope :first_available, -> { find_by('stock_qty > 0') }
+    scope :first_available_default, -> { find_by('is_default = true AND stock_qty > 0') }
+
     def has_images
       errors.add(:base, 'must add at least one image') if self.attachments.blank?
     end

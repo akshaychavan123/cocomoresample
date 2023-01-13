@@ -42,7 +42,23 @@ module BxBlockOrderManagement
     end
 
     attribute :product_price do |object|
-      object&.catalogue&.price
+      price = 0
+      if object&.catalogue_variant_id.present?
+        price = object.catalogue_variant&.on_sale? ? object.catalogue_variant&.sale_price : object.catalogue_variant&.price
+      else
+        price = object.catalogue&.on_sale? ? object.catalogue&.sale_price : object.catalogue&.price
+      end
+      price
+    end
+
+    attribute :item_total_price do |object|
+      price = 0
+      if object&.catalogue_variant_id.present?
+        price = object.catalogue_variant&.on_sale? ? object.catalogue_variant&.sale_price : object.catalogue_variant&.price
+      else
+        price = object.catalogue&.on_sale? ? object.catalogue&.sale_price : object.catalogue&.price
+      end
+      price.to_f * object.quantity.to_i
     end
 
     attribute :product_sale_price do |object|

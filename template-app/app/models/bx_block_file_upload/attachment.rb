@@ -66,4 +66,3 @@ module BxBlockFileUpload
     end
   end
 end
-

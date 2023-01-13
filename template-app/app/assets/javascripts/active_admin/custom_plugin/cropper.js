@@ -62,7 +62,7 @@ function handleDrop(e) {
   setTimeout(function () {
     const image = $("#croppableImage")[$("#croppableImage").length - 1];
     new Cropper(image, {
-      aspectRatio: 1 / 1,
+      aspectRatio: e.currentTarget.id=== 'brandSettingLogo'? NaN :1/1,
       crop(event) {},
       zoomable: true,
     });

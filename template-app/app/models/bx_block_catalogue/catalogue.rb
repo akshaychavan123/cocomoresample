@@ -65,7 +65,7 @@ module BxBlockCatalogue
 
     # Nested attributes
     accepts_nested_attributes_for :catalogue_subscriptions, allow_destroy: true
-    accepts_nested_attributes_for :attachments, allow_destroy: true
+    accepts_nested_attributes_for :attachments, allow_destroy: true, reject_if: :all_blank
     accepts_nested_attributes_for :catalogue_variants, allow_destroy: true, reject_if: :all_blank
     accepts_nested_attributes_for :catalogue_variants, allow_destroy: true
     accepts_nested_attributes_for :tags
@@ -89,8 +89,9 @@ module BxBlockCatalogue
     before_create :track_event
     before_save :set_stock_qty, :check_product_quantity, :set_current_availablity,
                 :calculate_tax_amount, :update_available_price
-    before_update :update_orders
+    after_update :update_orders
     after_save :add_system_sku, :update_default_variant, :inventory_low_stock_mailings
+    after_save :send_notification, if: -> { self.saved_change_to_availability? && self.in_stock? && self.product_notifies.present? }
     after_save :remove_draft_products_from_cart, if: -> { self.draft? }
     after_destroy :destroy_wishlist_items
 
@@ -129,10 +130,11 @@ module BxBlockCatalogue
     end
 
     def average_rating
-      return 0 if reviews.where(is_published: true).size.zero?
+      reviews = self.reviews.where(is_published: true)
+      return 0 if reviews.size.zero?
 
       total_rating = 0
-      reviews.where(is_published: true).each do |r|
+      reviews.each do |r|
         total_rating += r.rating
       end
       (total_rating.to_f / reviews.size.to_f).to_f.round(2)
@@ -247,6 +249,17 @@ module BxBlockCatalogue
     def update_orders
       order_items = BxBlockOrderManagement::OrderItem.where(catalogue_id: self.id)
       BxBlockOrderManagement::UpdateCartValueOnCatalogueUpdate.new(order_items).call
+    end
+
+    def send_notification
+      user_ids = self.product_notifies.pluck(:account_id)
+      message = "#{name} is now available in stock."
+      user_ids.each do |user_id|
+        user = AccountBlock::Account.find_by(id: user_id)
+        CatalogueVariantMailer.with(host: $hostname).product_stock_notification(self, user).deliver_now if user.present? && user.email.present?
+        BxBlockNotification::SendNotification.new("", message, 'PRODUCT IS BACK', user , { catalogue_id: id, notification_key: 'PRODUCT_IS_IN_STOCK'}).call if user.present? && user.email.present?
+      end
+      self.product_notifies.destroy_all
     end
   end
 end
