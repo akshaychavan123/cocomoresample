@@ -4,7 +4,7 @@ GEM
   specs:
     aasm (5.4.0)
       concurrent-ruby (~> 1.0)
-    ace-rails-ap (4.4)
+    ace-rails-ap (4.5)
     actioncable (6.1.0)
       actionpack (= 6.1.0)
       activesupport (= 6.1.0)
@@ -115,7 +115,7 @@ GEM
       font-awesome-sass (~> 5.0)
       jquery-rails
     aws-eventstream (1.2.0)
-    aws-partitions (1.691.0)
+    aws-partitions (1.693.0)
     aws-sdk-core (3.168.4)
       aws-eventstream (~> 1, >= 1.0.2)
       aws-partitions (~> 1, >= 1.651.0)
@@ -252,7 +252,7 @@ GEM
     loofah (2.19.1)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
-    mail (2.8.0)
+    mail (2.8.0.1)
       mini_mime (>= 0.1.1)
       net-imap
       net-pop
@@ -418,7 +418,7 @@ GEM
       actionpack (>= 5.2)
       activesupport (>= 5.2)
       sprockets (>= 3.0.0)
-    stripe (8.0.0)
+    stripe (8.1.0)
     studio_store_ecommerce_account (0.0.25)
       bcrypt
       builder_base
@@ -426,7 +426,7 @@ GEM
       phonelib
       studio_store_ecommerce_json_web_token
       wisper
-    studio_store_ecommerce_admin (0.0.97)
+    studio_store_ecommerce_admin (0.0.98)
       builder_base
       devise
       studio_store_ecommerce_account
@@ -439,12 +439,12 @@ GEM
       rqrcode
     studio_store_ecommerce_banner (0.0.11)
       builder_base
-    studio_store_ecommerce_cart (0.0.16)
+    studio_store_ecommerce_cart (0.0.17)
       builder_base
       studio_store_ecommerce_account
       studio_store_ecommerce_json_web_token
       studio_store_ecommerce_login
-    studio_store_ecommerce_catalogue (0.0.38)
+    studio_store_ecommerce_catalogue (0.0.39)
       builder_base
       studio_store_ecommerce_account
       studio_store_ecommerce_categories_sub_categories
@@ -515,7 +515,7 @@ GEM
       studio_store_ecommerce_account
       studio_store_ecommerce_json_web_token
       studio_store_ecommerce_login
-    studio_store_ecommerce_order_management (0.0.36)
+    studio_store_ecommerce_order_management (0.0.37)
       aasm
       builder_base
       studio_store_ecommerce_catalogue
@@ -658,11 +658,11 @@ DEPENDENCIES
   sidekiq_alive
   simplecov (= 0.17.0)
   studio_store_ecommerce_account (= 0.0.25)
-  studio_store_ecommerce_admin (= 0.0.97)
+  studio_store_ecommerce_admin (= 0.0.98)
   studio_store_ecommerce_api_configuration (= 0.0.19)
   studio_store_ecommerce_banner (= 0.0.11)
-  studio_store_ecommerce_cart (= 0.0.16)
-  studio_store_ecommerce_catalogue (= 0.0.38)
+  studio_store_ecommerce_cart (= 0.0.17)
+  studio_store_ecommerce_catalogue (= 0.0.39)
   studio_store_ecommerce_categories_sub_categories (= 0.0.19)
   studio_store_ecommerce_contact_us (= 0.0.6)
   studio_store_ecommerce_cors (= 0.0.4)
@@ -679,7 +679,7 @@ DEPENDENCIES
   studio_store_ecommerce_login (= 0.0.6)
   studio_store_ecommerce_notification (= 0.0.8)
   studio_store_ecommerce_notification_settings (= 0.0.1)
-  studio_store_ecommerce_order_management (= 0.0.36)
+  studio_store_ecommerce_order_management (= 0.0.37)
   studio_store_ecommerce_payment_razorpay (= 0.0.8)
   studio_store_ecommerce_profile (= 0.0.3)
   studio_store_ecommerce_role_and_permission (= 0.0.9)

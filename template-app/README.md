@@ -1,6 +1,6 @@
 # **Ruby** | _**CocoMore**_ | _**300779** | _**studio_store**_
 
-## **Catalog ProjectId: 155753** | **Catalog BuildId: 19783**
+## **Catalog ProjectId: 155753** | **Catalog BuildId: 19921**
 
 ## NOTE FOR DEVELOPERS:
 Clone the code-engine branch into your working branch. The contents of the branch may get overwritten.
@@ -10,6 +10,7 @@ Code-Engine
 
 | **Feature-Name**        | **Block-Name**        | **Path**  | **Status**  |
 |:-------------|:-------------|:-------------|:-------------|
+| InventoryManagement2      | bx_block_cart<br>      | {+app/controllers/bx_block_cart+}<br> | {+Non-Empty+} |
 | Payments      | bx_block_payment_razorpay<br>bx_block_stripe_integration<br>      | {+app/controllers/bx_block_payment_razorpay+}<br>{+app/controllers/bx_block_stripe_integration+}<br> | {+Non-Empty+} |
 | Scheduling2      | bx_block_scheduling<br>      | {+app/controllers/bx_block_scheduling+}<br> | {+Non-Empty+} |
 | Share2      | bx_block_share<br>      | {+app/controllers/bx_block_share+}<br> | {+Non-Empty+} |

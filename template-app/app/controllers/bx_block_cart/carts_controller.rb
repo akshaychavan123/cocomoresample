@@ -157,16 +157,16 @@ module BxBlockCart
           order_item_quantity = order_item.subscription_quantity.present? && order_item.subscription_quantity.to_i > 0 ? order_item.subscription_quantity.to_i : order_item.quantity.to_i
           block_qty = product.block_qty.to_i + order_item_quantity
           # block_qty = product.block_qty.to_i + order_item.quantity.to_i
-          product.update(block_qty: block_qty)
+          product.update_column('block_qty', block_qty)
           Rails.logger.error ">>>>>>>>>>>>>>>>>Product: #{product.inspect} #{order_item_quantity.to_i}>>>>>>>>>>>>"
           if product.class.name == "BxBlockCatalogue::CatalogueVariant"
-            product.catalogue.update(
-              block_qty: product.catalogue.block_qty.to_i + order_item.quantity.to_i
+            product.catalogue.update_column(
+              'block_qty', product.catalogue.block_qty.to_i + order_item.quantity.to_i
             )
           end
         end
 
-        if @order.update(is_availability_checked: true, availability_checked_at: Time.now, is_blocked: true)
+        if @order.update_columns(is_availability_checked: true, availability_checked_at: Time.now, is_blocked: true)
           Rails.logger.error ">>>>>>>>>>>>>>>>>Order is Updated>>>>>>>>>>>>"
         else
           Rails.logger.error ">>>>>>>>>>>>>>>>>Order: #{@order.errors.full_messages.to_sentence}>>>>>>>>>>>>"

@@ -88,7 +88,7 @@ module BxBlockCatalogue
     # Callbacks
     before_create :track_event
     before_save :set_stock_qty, :check_product_quantity, :set_current_availablity,
-                :calculate_tax_amount, :update_available_price
+                :calculate_tax_amount, :update_available_price, :check_variants_on_sale
     after_update :update_orders
     after_save :add_system_sku, :update_default_variant, :inventory_low_stock_mailings
     after_save :send_notification, if: -> { self.saved_change_to_availability? && self.in_stock? && self.product_notifies.present? }
@@ -228,6 +228,17 @@ module BxBlockCatalogue
       BxBlockWishlist::WishlistItem.by_catalogue_id(self.id).destroy_all
     end
 
+    def self.new_variant_sample_csv
+      csv_data = []
+
+      # heading
+      csv_data << ["name", "sku", "category", "sub_category", "brand", "tags", "description", "manufacture_date", "length", "breadth", "height", "availability", "stock_qty", "weight", "price", "on_sale", "sale_price", "recommended", "discount", "block_qty", "tax", "sold", "default", "product_image", "variant_1_name", "variant_1_options", "variant_2_name", "variant_2_options", "variant_price", "variant_stock_qty", "variant_on_sale", "variant_sale_price", "variant_discount_price", "variant_length", "variant_breadth", "variant_height", "variant_block_qty", "variant_tax", "variant image"]
+      # info
+      csv_data << ["Aspire","SKU834", "Category 1","Sub Category 1","Brand 1","Tag 1","acer description","26/02/21","12","13","14","in_stock","13","10","15000","FALSE","13500","TRUE", "500","1","14.0", "", "TRUE", "https://dummyimage.com/600x400/000/0000ff.jpg", "size", "small", "color", "red", "16000","4","FALSE","15500","","12","13","14","2","12.0", "https://dummyimage.com/600x400/000/0000ff.jpg"]
+
+      csv_data
+    end
+
     private
 
     def has_tax
@@ -260,6 +271,13 @@ module BxBlockCatalogue
         BxBlockNotification::SendNotification.new("", message, 'PRODUCT IS BACK', user , { catalogue_id: id, notification_key: 'PRODUCT_IS_IN_STOCK'}).call if user.present? && user.email.present?
       end
       self.product_notifies.destroy_all
+    end
+
+    def check_variants_on_sale
+      if self.catalogue_variants.present? && !self.catalogue_variants.exists?(on_sale: true)
+        self.on_sale = false
+        self.discount = nil
+      end
     end
   end
 end

@@ -113,11 +113,12 @@
         </td>
         <td><%= number_with_precision(order_item.basic_amount.to_f.round(2), :precision => 2) %></td>
         <% if is_in_same_state %>
+          <% tax = order_item.catalogue_variant.present? ? order_item.catalogue_variant.tax : order_item.catalogue.tax %>
           <td>
-            <%= (order_item.catalogue.tax.tax_percentage/2).to_f rescue 0 %>%
+            <%= (tax.tax_percentage/2).to_f rescue 0 %>%
           </td>
           <td>
-            <%= (order_item.catalogue.tax.tax_percentage/2).to_f rescue 0 %>%
+            <%= (tax.tax_percentage/2).to_f rescue 0 %>%
           </td>
           <td>
             <%= number_with_precision(gst_total/2, :precision => 2) %>
@@ -127,7 +128,8 @@
           </td>
         <% else %>
           <td>
-            <%= order_item.catalogue.tax.tax_percentage rescue 0 %>%
+            <% tax = order_item.catalogue_variant.present? ? order_item.catalogue_variant.tax : order_item.catalogue.tax %>
+            <%= tax.tax_percentage rescue 0 %>%
           </td>
           <td>
             <%= number_with_precision(gst_total, :precision => 2) %>

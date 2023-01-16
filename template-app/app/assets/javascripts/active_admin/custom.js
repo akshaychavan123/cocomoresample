@@ -14,7 +14,7 @@ jQuery(function () {
   });
 
   $(".on_sale").each(function () {
-    update_sale_field($(this));
+    updateSaleField($(this));
   });
 
   $(".brand_setting_country").change(function () {
@@ -100,7 +100,7 @@ jQuery(function () {
   });
 
   $(document).on("change", ".on_sale, input[name*='on_sale']", function () {
-    update_sale_field($(this));
+    updateSaleField($(this));
   });
 
   $(document).on(
@@ -196,19 +196,28 @@ $(document).on("click", ".catalogue_subscriptions a", function (evt) {
   $(".catalogue_variants").hide();
 });
 
-function update_sale_field(element) {
-  discount_field =
-    element.closest("ol").find(".discount").length < 1
-      ? element.closest("ul").find("input[name=discount]")
-      : element.closest("ol").find(".discount");
-  sale_price_field =
-    element.closest("ol").find(".sale_price").length < 1
-      ? element.closest("ul").find("input[name=sale_price]")
-      : element.closest("ol").find(".sale_price");
-  if (element.is(":checked")) sale_price_field.attr("readonly", false);
-  else {
+function toggleSaleField(element, sale_price_field, discount_field) {
+  if (element.is(":checked")) {
+    sale_price_field.attr("readonly", false);
+  } else {
     sale_price_field.attr("readonly", true).val("");
     discount_field.val("");
+  }
+}
+
+function updateSaleField(element) {
+  if (element.attr('id') == 'catalogue_on_sale') {
+    toggleSaleField(element, $('#catalogue_sale_price'), $('#catalogue_discount'));
+  } else {
+    discount_field =
+      element.closest("ol").find(".discount").length < 1
+        ? element.closest("ul").find("input[name=discount]")
+        : element.closest("ol").find(".discount");
+    sale_price_field =
+      element.closest("ol").find(".sale_price").length < 1
+        ? element.closest("ul").find("input[name=sale_price]")
+        : element.closest("ol").find(".sale_price");
+    toggleSaleField(element, sale_price_field, discount_field);
   }
 }
 

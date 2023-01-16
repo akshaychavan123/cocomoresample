@@ -357,11 +357,11 @@ module BxBlockOrderManagement
           if self.placed?
             product.with_lock do
               if product.class.name == "BxBlockCatalogue::CatalogueVariant"
-                product.update!(stock_qty: (product.stock_qty.to_i - quantity),
+                product.update_columns(stock_qty: (product.stock_qty.to_i - quantity),
                                 block_qty: product.block_qty.to_i - quantity.to_i)
-                product.catalogue.update(stock_qty: product.catalogue.stock_qty - quantity, block_qty: product.catalogue.block_qty.to_i - quantity.to_i, sold: (product.catalogue.sold.to_i + quantity))
+                product.catalogue.update_columns(stock_qty: product.catalogue.stock_qty - quantity, block_qty: product.catalogue.block_qty.to_i - quantity.to_i, sold: (product.catalogue.sold.to_i + quantity))
               elsif product.class.name == "BxBlockCatalogue::Catalogue"
-                product.update!(stock_qty: (product.stock_qty.to_i - quantity - subscription_quantity.to_i),
+                product.update_columns(stock_qty: (product.stock_qty.to_i - quantity - subscription_quantity.to_i),
                                 block_qty: product.block_qty.to_i - quantity.to_i - subscription_quantity.to_i, sold: (product.sold.to_i + quantity + subscription_quantity)
                 )
               end
@@ -369,9 +369,9 @@ module BxBlockOrderManagement
             order_item.create_subscription_orders
           elsif self.cancelled?
             product.with_lock do
-              product.update(stock_qty: product.stock_qty + quantity )
+              product.update_column('stock_qty', product.stock_qty + quantity )
               if product.class.name == "BxBlockCatalogue::CatalogueVariant"
-                product.catalogue.update(stock_qty: product.catalogue.stock_qty + quantity)
+                product.catalogue.update_column('stock_qty', product.catalogue.stock_qty + quantity)
               end
             end
             order_item.cancel_subscription_orders
