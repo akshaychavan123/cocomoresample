@@ -338,21 +338,12 @@ unless Products::Load.is_loaded_from_gem
     end
 
     collection_action :download, method: :get do
-      # file_name = Rails.root + "lib/products.csv"
-      # send_file file_name, type: "application/csv"
-      variants = BxBlockCatalogue::Variant.all.pluck(:name)
-      variant_properties = []
-      BxBlockCatalogue::Variant.all.each do |variant|
-        variant_properties.push(BxBlockCatalogue::VariantProperty.all.where(variant_id: variant.id).first.name)
-      end
-
       csv_string = CSV.generate do |csv|
-        cols = ["category", "sub_category", "brand", "tags", "name", "sku", "description", "manufacture_date", "length", "breadth", "height", "availability", "stock_qty", "weight", "price", "on_sale", "sale_price", "recommended", "discount", "block_qty", "tax", "variant_price", "variant_stock_qty", "variant_on_sale", "variant_sale_price", "variant_discount_price", "variant_length", "variant_breadth", "variant_height", "variant_block_qty", "variant_tax", "default"]
-        variants.map { |name| cols << 'variant_' + name }.flatten
-        csv << cols
-        data = ["Category 1","Sub Category 1","Brand 1","Tag 1","Aspire","SKU834","acer description","26/02/21","12","13","14","in_stock","13","10","15000","FALSE","13500","TRUE","500","1","14.0","16000","4","FALSE","15500","","12","13","14","2","12.0","TRUE"]
-        variant_properties.map { |name| data << name }.flatten
-        csv << data
+        csv_data = BxBlockCatalogue::Catalogue.new_variant_sample_csv
+        # heading
+        csv << csv_data[0]
+        # info
+        csv << csv_data[1]
 
         @filename = "product_sample_file-#{Time.now.to_date.to_s}.csv"
       end
@@ -366,28 +357,14 @@ unless Products::Load.is_loaded_from_gem
     collection_action :import_csv, :method => :post do
       if params[:upload_csv] && params[:upload_csv][:file]
         if params[:upload_csv][:file].content_type.include?("csv")
-          csv_errors = {}
-          count, csv_errors = CsvDb.convert_save("BxBlockCatalogue::Catalogue", params[:upload_csv][:file])
-          if count > 0 || csv_errors.present?
-            success_message = "#{count} products uploaded/updated successfully. \n"
-            error_message = ""
-            if csv_errors.present?
-              error_message += "CSV has error(s) on: \n"
-              csv_errors.each do |error|
-                error_message += error[0] + error[1].join(", ")
-              end
-            end
-
-
-            flash_data = { notice: success_message }
-            flash_data[:error] = error_message if error_message.present?
-
-            redirect_to admin_products_path, flash: flash_data
-          elsif !csv_errors.empty?
-            redirect_to upload_csv_admin_products_path, flash[:error] = csv_errors
-          else
-            redirect_to upload_csv_admin_products_path, flash: {error: "There is some problem with CSV. Please check sample file and upload again!"}
+          csv_path = "tmp/#{params[:upload_csv][:file].original_filename}"
+          File.open(csv_path, 'wb') do |f|
+            f.write params[:upload_csv][:file].read
           end
+
+          BxBlockCatalogue::CatalogueCsvUploadJob.perform_later(csv_path)
+
+          redirect_to upload_csv_admin_products_path, flash: {warning: "File upload has been started!"}
         else
           redirect_to upload_csv_admin_products_path, flash: {error: "File format not valid!"}
         end

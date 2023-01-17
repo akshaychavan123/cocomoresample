@@ -29,11 +29,13 @@ module BxBlockOrderManagement
         order.order_items.each do |order_item|
           if order_item.catalogue_variant_id.present?
             price = order_item.catalogue_variant.sale_price.present? ? order_item.catalogue_variant.sale_price : order_item.catalogue_variant.price
+            tax = order_item.catalogue_variant.tax
           else
             price = order_item.catalogue.sale_price.present? ? order_item.catalogue.sale_price : order_item.catalogue.price
+            tax = order_item.catalogue.tax
           end
           total_amount = price - (discount * price) / cart_value
-          gst_amount = (((total_amount * order_item.catalogue.tax&.tax_percentage.to_f)/100) *100) / (100+order_item.catalogue.tax&.tax_percentage.to_f)
+          gst_amount = (((total_amount * tax&.tax_percentage.to_f)/100) *100) / (100+tax&.tax_percentage.to_f)
           basic_amount = (total_amount - gst_amount)
           order_item.update_columns(unit_price: total_amount, total_price: (total_amount * order_item.order_item_qty), basic_amount: basic_amount.to_f.round(2), tax_amount: gst_amount.to_f.round(2))
         end
