@@ -1,6 +1,6 @@
 # **Ruby** | _**CocoMore**_ | _**300779** | _**studio_store**_
 
-## **Catalog ProjectId: 155753** | **Catalog BuildId: 19921**
+## **Catalog ProjectId: 155753** | **Catalog BuildId: 20932**
 
 ## NOTE FOR DEVELOPERS:
 Clone the code-engine branch into your working branch. The contents of the branch may get overwritten.
@@ -10,7 +10,6 @@ Code-Engine
 
 | **Feature-Name**        | **Block-Name**        | **Path**  | **Status**  |
 |:-------------|:-------------|:-------------|:-------------|
-| InventoryManagement2      | bx_block_cart<br>      | {+app/controllers/bx_block_cart+}<br> | {+Non-Empty+} |
 | Payments      | bx_block_payment_razorpay<br>bx_block_stripe_integration<br>      | {+app/controllers/bx_block_payment_razorpay+}<br>{+app/controllers/bx_block_stripe_integration+}<br> | {+Non-Empty+} |
 | Scheduling2      | bx_block_scheduling<br>      | {+app/controllers/bx_block_scheduling+}<br> | {+Non-Empty+} |
 | Share2      | bx_block_share<br>      | {+app/controllers/bx_block_share+}<br> | {+Non-Empty+} |
@@ -46,6 +45,7 @@ Code-Engine
 | OrderDetailView      | bx_block_order_management<br>      | {+app/controllers/bx_block_order_management+}<br> | {+Non-Empty+} |
 | ApiIntegration18      | bx_block_api_configuration<br>bx_block_fedex_integration<br>studio_store_ecommerce_cors<br>      | {+app/controllers/bx_block_api_configuration+}<br>{+app/controllers/bx_block_fedex_integration+}<br>{++}<br> | {+Non-Empty+} |
 | EmailNotifications2      | bx_block_notification_settings<br>bx_block_notification<br>bx_block_email_notifications<br>      | {+app/controllers/bx_block_notification_settings+}<br>{+app/controllers/bx_block_notification+}<br>{+app/controllers/bx_block_email_notifications+}<br> | {+Non-Empty+} |
+| InventoryManagement2      | bx_block_cart<br>      | {+app/controllers/bx_block_cart+}<br> | {+Non-Empty+} |
 | BulkUploading      | bx_block_bulkuploading      | {-app/controllers/bx_block_bulkuploading-} | {-Empty-} |
 | InvoiceBilling      | bx_block_invoicebilling      | {-app/controllers/bx_block_invoicebilling-} | {-Empty-} |
 | SplashScreen2      | bx_block_splashscreen2      | {-app/controllers/bx_block_splashscreen2-} | {-Empty-} |
@@ -54,6 +54,7 @@ Code-Engine
 | LiveChat      | bx_block_livechat      | {-app/controllers/bx_block_livechat-} | {-Empty-} |
 | DiscountsOffers      | bx_block_discountsoffers      | {-app/controllers/bx_block_discountsoffers-} | {-Empty-} |
 | AdHocReporting      | bx_block_adhocreporting      | {-app/controllers/bx_block_adhocreporting-} | {-Empty-} |
+| CustomiseInterface      | bx_block_customiseinterface      | {-app/controllers/bx_block_customiseinterface-} | {-Empty-} |
 
 ## GRAFANA BACKEND URL
  - https://grafana.<\<error-empty-cat-url>>
