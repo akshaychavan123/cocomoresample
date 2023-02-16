@@ -106,10 +106,10 @@ Rails.application.configure do
   # config.active_record.database_resolver = ActiveRecord::Middleware::DatabaseSelector::Resolver
   # config.active_record.database_resolver_context = ActiveRecord::Middleware::DatabaseSelector::Resolver::Session
   config.action_mailer.smtp_settings = {
-    address:              'email-smtp.us-east-1.amazonaws.com',
-    port:                 '587',
-    user_name:            'AKIA2YL6V6FWQO3Q434A',
-    password:             'BA+0A6h+EwUVWi6nTFA4bYrM2rceY9YABawqMhW/8GHL',
-    authentication:       :login,
+    address: ENV['SMTP_ADDRESS'],
+    port: ENV['SMTP_PORT'],
+    user_name: ENV['SMTP_EMAIL_USERNAME'],
+    password: ENV['SMTP_EMAIL_PASSWORD'],
+    authentication: :login,
   }
 end
