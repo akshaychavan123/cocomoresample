@@ -1,6 +1,6 @@
 # **Ruby** | _**CocoMore**_ | _**300779** | _**studio_store**_
 
-## **Catalog ProjectId: 155753** | **Catalog BuildId: 19921**
+## **Catalog ProjectId: 155753** | **Catalog BuildId: 21221**
 
 ## NOTE FOR DEVELOPERS:
 Clone the code-engine branch into your working branch. The contents of the branch may get overwritten.
@@ -10,7 +10,6 @@ Code-Engine
 
 | **Feature-Name**        | **Block-Name**        | **Path**  | **Status**  |
 |:-------------|:-------------|:-------------|:-------------|
-| InventoryManagement2      | bx_block_cart<br>      | {+app/controllers/bx_block_cart+}<br> | {+Non-Empty+} |
 | Payments      | bx_block_payment_razorpay<br>bx_block_stripe_integration<br>      | {+app/controllers/bx_block_payment_razorpay+}<br>{+app/controllers/bx_block_stripe_integration+}<br> | {+Non-Empty+} |
 | Scheduling2      | bx_block_scheduling<br>      | {+app/controllers/bx_block_scheduling+}<br> | {+Non-Empty+} |
 | Share2      | bx_block_share<br>      | {+app/controllers/bx_block_share+}<br> | {+Non-Empty+} |
@@ -19,9 +18,9 @@ Code-Engine
 | PushNotifications      | bx_block_notification_settings<br>bx_block_notification<br>      | {+app/controllers/bx_block_notification_settings+}<br>{+app/controllers/bx_block_notification+}<br> | {+Non-Empty+} |
 | Sms2      | account_block<br>      | {+app/controllers/account_block+}<br> | {+Non-Empty+} |
 | OrderManagement2      | bx_block_order_management<br>      | {+app/controllers/bx_block_order_management+}<br> | {+Non-Empty+} |
-| Dashboard4      | bx_block_dashboard<br>      | {+app/controllers/bx_block_dashboard+}<br> | {+Non-Empty+} |
+| Dashboard3      | bx_block_dashboard<br>      | {+app/controllers/bx_block_dashboard+}<br> | {+Non-Empty+} |
 | Catalogue      | bx_block_catalogue<br>      | {+app/controllers/bx_block_catalogue+}<br> | {+Non-Empty+} |
-| AdminConsole      | bx_block_admin<br>bx_block_banner<br>bx_block_store_profile<br>bx_block_api_configuration<br>bx_block_file_upload<br>      | {+app/controllers/bx_block_admin+}<br>{+app/controllers/bx_block_banner+}<br>{+app/controllers/bx_block_store_profile+}<br>{+app/controllers/bx_block_api_configuration+}<br>{+app/controllers/bx_block_file_upload+}<br> | {+Non-Empty+} |
+| AdminConsole2      | bx_block_admin<br>bx_block_banner<br>bx_block_store_profile<br>bx_block_api_configuration<br>bx_block_file_upload<br>      | {+app/controllers/bx_block_admin+}<br>{+app/controllers/bx_block_banner+}<br>{+app/controllers/bx_block_store_profile+}<br>{+app/controllers/bx_block_api_configuration+}<br>{+app/controllers/bx_block_file_upload+}<br> | {+Non-Empty+} |
 | FacebookLogin      | bx_block_login<br>bx_block_social_media_account<br>account_block<br>      | {+app/controllers/bx_block_login+}<br>{+app/controllers/bx_block_social_media_account+}<br>{+app/controllers/account_block+}<br> | {+Non-Empty+} |
 | RolesPermissions      | bx_block_role_and_permission<br>      | {+app/controllers/bx_block_role_and_permission+}<br> | {+Non-Empty+} |
 | InteractiveFaqs      | bx_block_interactive_faqs<br>      | {+app/controllers/bx_block_interactive_faqs+}<br> | {+Non-Empty+} |
@@ -46,14 +45,17 @@ Code-Engine
 | OrderDetailView      | bx_block_order_management<br>      | {+app/controllers/bx_block_order_management+}<br> | {+Non-Empty+} |
 | ApiIntegration18      | bx_block_api_configuration<br>bx_block_fedex_integration<br>studio_store_ecommerce_cors<br>      | {+app/controllers/bx_block_api_configuration+}<br>{+app/controllers/bx_block_fedex_integration+}<br>{++}<br> | {+Non-Empty+} |
 | EmailNotifications2      | bx_block_notification_settings<br>bx_block_notification<br>bx_block_email_notifications<br>      | {+app/controllers/bx_block_notification_settings+}<br>{+app/controllers/bx_block_notification+}<br>{+app/controllers/bx_block_email_notifications+}<br> | {+Non-Empty+} |
+| InventoryManagement2      | bx_block_cart<br>      | {+app/controllers/bx_block_cart+}<br> | {+Non-Empty+} |
+| CustomiseInterface      | bx_block_customiseinterface      | {-app/controllers/bx_block_customiseinterface-} | {-Empty-} |
 | BulkUploading      | bx_block_bulkuploading      | {-app/controllers/bx_block_bulkuploading-} | {-Empty-} |
 | InvoiceBilling      | bx_block_invoicebilling      | {-app/controllers/bx_block_invoicebilling-} | {-Empty-} |
-| SplashScreen2      | bx_block_splashscreen2      | {-app/controllers/bx_block_splashscreen2-} | {-Empty-} |
+| SplashScreen3      | bx_block_splashscreen3      | {-app/controllers/bx_block_splashscreen3-} | {-Empty-} |
 | EmailLists      | bx_block_emaillists      | {-app/controllers/bx_block_emaillists-} | {-Empty-} |
 | TargetedFeed      | bx_block_targetedfeed      | {-app/controllers/bx_block_targetedfeed-} | {-Empty-} |
 | LiveChat      | bx_block_livechat      | {-app/controllers/bx_block_livechat-} | {-Empty-} |
 | DiscountsOffers      | bx_block_discountsoffers      | {-app/controllers/bx_block_discountsoffers-} | {-Empty-} |
 | AdHocReporting      | bx_block_adhocreporting      | {-app/controllers/bx_block_adhocreporting-} | {-Empty-} |
+| FileAttachment      | bx_block_fileattachment      | {-app/controllers/bx_block_fileattachment-} | {-Empty-} |
 
 ## GRAFANA BACKEND URL
  - https://grafana.<\<error-empty-cat-url>>

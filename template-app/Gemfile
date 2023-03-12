@@ -63,7 +63,7 @@ gem 'studio_store_ecommerce_contact_us', '0.0.6', require: 'bx_block_contact_us'
 gem 'studio_store_ecommerce_fedex_integration', '0.0.2', require: 'bx_block_fedex_integration'
 gem 'studio_store_ecommerce_cors', '0.0.4', require: 'bx_block_cors'
 gem 'studio_store_ecommerce_email_notifications', '0.0.12', require: 'bx_block_email_notifications'
-gem 'builder_base', '0.0.49'
+gem 'builder_base', '0.0.54'
 group :development, :test do
     gem 'rspec-sonarqube-formatter', '1.5.0'
     gem 'rspec-rails', '5.1.2'
