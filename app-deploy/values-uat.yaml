@@ -28,6 +28,7 @@ annotations:
   prometheus.io/port: '3000'
   prometheus.io/scrape: 'true'
 appExtConfig:
+  CDN_ENDPOINT: '[]'
   OFFICE365_ACCOUNT_ID: 4006c537-61a5-42bb-a9e6-6ff53b75730c
   OFFICE365_EMAIL: admin@builderautomddajpvvcli.onmicrosoft.com
   OFFICE365_PASSWORD: G4mDHtjP*
