@@ -30,7 +30,7 @@ annotations:
 appExtConfig:
   CDN_ENDPOINT: '[]'
   DL_APP_NAME: ecommerceapp
-  HOST_URL: cocomore-300779-ruby.b300779.dev.eastus.az.svc.builder.cafe/
+  HOST_URL: cocomore-300779-ruby.b300779.prod.eastus.az.svc.builder.ai
   NAMESPACE: CocoMore-300779
   OFFICE365_ACCOUNT_ID: 4006c537-61a5-42bb-a9e6-6ff53b75730c
   OFFICE365_EMAIL: admin@builderautomddajpvvcli.onmicrosoft.com
