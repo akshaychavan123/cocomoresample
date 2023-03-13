@@ -3,31 +3,32 @@ PodDisruptionBudget:
 affinity:
   podAntiAffinity:
     preferredDuringSchedulingIgnoredDuringExecution:
-      - podAffinityTerm:
-          labelSelector:
-            matchExpressions:
-              - key: app.kubernetes.io/name
-                operator: In
-                values:
-                  - app-deploy
-          topologyKey: kubernetes.io/hostname
-        weight: 1
+    - podAffinityTerm:
+        labelSelector:
+          matchExpressions:
+          - key: app.kubernetes.io/name
+            operator: In
+            values:
+            - app-deploy
+        topologyKey: kubernetes.io/hostname
+      weight: 1
 affinitySidekiq:
   podAntiAffinity:
     preferredDuringSchedulingIgnoredDuringExecution:
-      - podAffinityTerm:
-          labelSelector:
-            matchExpressions:
-              - key: app.kubernetes.io/name
-                operator: In
-                values:
-                  - app-deploySidekiq
-          topologyKey: kubernetes.io/hostname
-        weight: 1
+    - podAffinityTerm:
+        labelSelector:
+          matchExpressions:
+          - key: app.kubernetes.io/name
+            operator: In
+            values:
+            - app-deploySidekiq
+        topologyKey: kubernetes.io/hostname
+      weight: 1
 annotations:
   prometheus.io/port: '3000'
   prometheus.io/scrape: 'true'
 appExtConfig:
+  CDN_ENDPOINT: '[]'
   DL_APP_NAME: ecommerceapp
   HOST_URL: cocomore-300779-ruby.b300779.dev.eastus.az.svc.builder.cafe/
   NAMESPACE: CocoMore-300779
@@ -42,24 +43,24 @@ appExtConfig:
   REDIS_URL: redis
   RUBY_ANALYTICS_TOKEN: ADvoiejfyI6IHGJbitMe9MGLbkPRxj6n
   SMTP_ADDRESS: email-smtp.us-east-1.amazonaws.com
+  SMTP_EMAIL_PASSWORD: BA+0A6h+EwUVWi6nTFA4bYrM2rceY9YABawqMhW/8GHL
+  SMTP_EMAIL_USERNAME: AKIA2YL6V6FWQO3Q434A
   SMTP_PORT: '587'
   USER_ID: edf0fffc-941d-461c-9d3f-0a0099af5e35
   USER_NAME: cocomore_300779@email.store.builder.ai
-  SMTP_EMAIL_USERNAME: AKIA2YL6V6FWQO3Q434A
-  SMTP_EMAIL_PASSWORD: BA+0A6h+EwUVWi6nTFA4bYrM2rceY9YABawqMhW/8GHL
 autoscaling:
   behavior:
     scaleDown:
       policies:
-        - periodSeconds: 60
-          type: Percent
-          value: 25
+      - periodSeconds: 60
+        type: Percent
+        value: 25
       stabilizationWindowSeconds: 600
     scaleUp:
       policies:
-        - periodSeconds: 30
-          type: Percent
-          value: 100
+      - periodSeconds: 30
+        type: Percent
+        value: 100
       stabilizationWindowSeconds: 0
   enabled: true
   maxReplicas: 4
@@ -79,14 +80,14 @@ ingress:
     nginx.ingress.kubernetes.io/proxy-body-size: 50m
   enabled: true
   hosts:
-    - host: rrapp.local
-      paths:
-        - /
+  - host: rrapp.local
+    paths:
+    - /
   rsa_key_length: '2048'
   tls:
-    - hosts:
-        - rrapp.local
-      secretName: https-cert
+  - hosts:
+    - rrapp.local
+    secretName: https-cert
 nameOverride: ''
 nodeSelector: {}
 podSecurityContext: {}
@@ -108,11 +109,11 @@ probesSidekiq:
     periodSeconds: 20
 railsMigration:
   command:
-    - bundle
-    - exec
-    - rails
-    - db:migrate
-    - db:seed
+  - bundle
+  - exec
+  - rails
+  - db:migrate
+  - db:seed
   enabled: true
   retry: 2
   timeout: 300
@@ -124,15 +125,15 @@ railsSidekiq:
     behavior:
       scaleDown:
         policies:
-          - periodSeconds: 60
-            type: Percent
-            value: 25
+        - periodSeconds: 60
+          type: Percent
+          value: 25
         stabilizationWindowSeconds: 600
       scaleUp:
         policies:
-          - periodSeconds: 30
-            type: Percent
-            value: 100
+        - periodSeconds: 30
+          type: Percent
+          value: 100
         stabilizationWindowSeconds: 0
     enabled: true
     maxReplicas: 4
@@ -153,7 +154,7 @@ securityContext:
   allowPrivilegeEscalation: false
   capabilities:
     drop:
-      - ALL
+    - ALL
   privileged: false
   readOnlyRootFilesystem: false
   runAsNonRoot: true
